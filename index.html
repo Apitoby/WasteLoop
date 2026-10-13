@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>WasteLoop</title>
+<meta name="description" content="Snap unwanted items; AI sorts them into reuse, recycle or dispose for your township.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0D6B4E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="WasteLoop">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+body{margin:0;-webkit-tap-highlight-color:transparent}
+img{max-width:100%}
+[hidden]{display:none!important}
+.install{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:.9rem}
+.install svg{width:20px;height:20px;flex:none;color:var(--accent)}
+.cam{width:100%;max-width:280px;aspect-ratio:1;object-fit:cover;border-radius:16px;align-self:center;background:#0b0f0d}
+/* Layout: app shell — header with role switch, left rail nav on desktop / bottom tab bar on phone, single content column */
+:root{
+  --bg:#EFF2EB; --surface:#FFFFFF; --surface-2:#E4E9DF; --ink:#16201A; --muted:#58675D; --line:#D2D9CC;
+  --accent:#0D6B4E; --accent-ink:#FFFFFF; --accent-soft:#D5E9DF;
+  --reuse:#1E8A4A; --recycle:#D97A1E; --dispose:#667085; --warn:#A86A0C; --danger:#B42318;
+  --shadow:0 1px 2px rgba(22,32,26,.06),0 6px 20px rgba(22,32,26,.06);
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1411; --surface:#161F1A; --surface-2:#1F2A24; --ink:#E5ECE6; --muted:#97A89D; --line:#2B3731;
+  --accent:#43C08F; --accent-ink:#04130C; --accent-soft:#16372A;
+  --reuse:#4FC47F; --recycle:#F0A04D; --dispose:#9AA3B2; --warn:#E3A93C; --danger:#F07468;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1411; --surface:#161F1A; --surface-2:#1F2A24; --ink:#E5ECE6; --muted:#97A89D; --line:#2B3731;
+  --accent:#43C08F; --accent-ink:#04130C; --accent-soft:#16372A;
+  --reuse:#4FC47F; --recycle:#F0A04D; --dispose:#9AA3B2; --warn:#E3A93C; --danger:#F07468;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.25rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1.02rem;font-weight:700}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:12px;padding:10px 16px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:-.02em}
+.brand-mark{width:30px;height:30px;flex:none}
+.brand small{font-family:var(--f-body);font-weight:500;font-size:.75rem;color:var(--muted);letter-spacing:0}
+.spacer{flex:1}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 13px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.86rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.iconbtn{position:relative;border:1px solid var(--line);background:var(--surface);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.iconbtn svg{width:19px;height:19px}
+.dot{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center}
+.pts-chip{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);font-weight:700;border-radius:999px;padding:6px 12px;font-size:.86rem;border:0;cursor:pointer}
+
+/* shell */
+.shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;padding:20px 16px 40px}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);align-self:start;display:flex;flex-direction:column;gap:3px}
+.rail button{display:flex;align-items:center;gap:11px;border:0;background:transparent;padding:10px 12px;border-radius:11px;cursor:pointer;font-weight:600;color:var(--muted);text-align:left}
+.rail button svg{width:20px;height:20px;flex:none}
+.rail button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.rail button[aria-current="page"] svg{color:var(--accent)}
+.rail-foot{margin-top:18px;padding:12px;border:1px dashed var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px}
+main{min-width:0;display:flex;flex-direction:column;gap:22px}
+.tabbar{display:none}
+
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr);padding-bottom:110px}
+  .rail{display:none}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar button{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;font-weight:600;color:var(--muted);padding:6px 0;cursor:pointer;border-radius:10px}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button[aria-current="page"]{color:var(--accent)}
+  .brand small{display:none}
+}
+
+/* generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:10px}
+.grid{display:grid;gap:14px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:9px 15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:.92rem}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 11px;font-size:.84rem;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn svg{width:17px;height:17px}
+label.f{display:flex;flex-direction:column;gap:5px;font-size:.84rem;font-weight:600;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;width:100%;color:var(--ink);font-weight:400;font-size:.95rem}
+textarea{resize:vertical;min-height:70px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
+.pill.reuse{background:color-mix(in oklab,var(--reuse) 16%,transparent);color:var(--reuse)}
+.pill.recycle{background:color-mix(in oklab,var(--recycle) 18%,transparent);color:var(--recycle)}
+.pill.dispose{background:color-mix(in oklab,var(--dispose) 20%,transparent);color:var(--dispose)}
+.pill.neutral{background:var(--surface-2);color:var(--muted)}
+.pill.warn{background:color-mix(in oklab,var(--warn) 18%,transparent);color:var(--warn)}
+.pill.accent{background:var(--accent-soft);color:var(--accent)}
+.sample-tag{font-size:.7rem;font-weight:600;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:2px 7px}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.page-head p{max-width:62ch}
+.subtabs{display:flex;gap:6px;flex-wrap:wrap}
+.subtabs button{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.86rem;color:var(--muted)}
+.subtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:var(--r)}
+
+/* snap */
+.snap-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.snap-grid{grid-template-columns:minmax(0,1fr)}}
+.drop{position:relative;border:2px dashed color-mix(in oklab,var(--accent) 45%,var(--line));border-radius:18px;background:
+  repeating-linear-gradient(135deg,transparent 0 14px,color-mix(in oklab,var(--accent) 5%,transparent) 14px 28px),var(--surface);
+  min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s,background-color .15s}
+.drop.over{border-color:var(--accent);background-color:var(--accent-soft)}
+.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.lens{width:76px;height:76px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 0 0 8px var(--accent-soft)}
+.lens svg{width:34px;height:34px}
+.routes3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.routes3{grid-template-columns:minmax(0,1fr)}}
+.route-key{border-radius:12px;padding:12px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:4px}
+.route-key b{font-family:var(--f-display);font-size:1.02rem}
+.route-key.reuse b{color:var(--reuse)} .route-key.recycle b{color:var(--recycle)} .route-key.dispose b{color:var(--dispose)}
+.analyzing{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px;align-items:center}
+@media (max-width:560px){.analyzing{grid-template-columns:minmax(0,1fr)}}
+.photo{width:100%;max-width:100%;aspect-ratio:1;border-radius:14px;object-fit:cover;background:var(--surface-2);display:block}
+.scanwrap{position:relative;overflow:hidden;border-radius:14px}
+.scanwrap::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--accent);box-shadow:0 0 18px 4px var(--accent);top:0;animation:scan 1.8s ease-in-out infinite alternate}
+@keyframes scan{to{top:calc(100% - 3px)}}
+@media (prefers-reduced-motion:reduce){.scanwrap::after{animation:none;top:50%}}
+.verdict{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:20px}
+@media (max-width:620px){.verdict{grid-template-columns:minmax(0,1fr)}.verdict .photo{max-width:240px}}
+.stamp{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;padding:4px 14px 4px 6px;border-radius:12px;border:2.5px solid currentColor;transform:rotate(-1.5deg)}
+.stamp .ico{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:currentColor}
+.stamp .ico svg{width:20px;height:20px;color:var(--surface)}
+.stamp.reuse{color:var(--reuse)} .stamp.recycle{color:var(--recycle)} .stamp.dispose{color:var(--dispose)}
+.meter{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;width:120px}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.facts div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.facts b{font-family:var(--f-mono);font-size:.98rem;font-variant-numeric:tabular-nums}
+.tip{display:flex;gap:10px;background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:.92rem}
+.tip svg{width:20px;height:20px;flex:none;color:var(--accent);margin-top:1px}
+.chat{display:flex;flex-direction:column;gap:10px}
+.bubble{padding:10px 13px;border-radius:14px;max-width:85%;white-space:pre-wrap;font-size:.93rem}
+.bubble.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
+.bubble.ai{align-self:flex-start;background:var(--surface-2);border-bottom-left-radius:4px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.84rem;cursor:pointer;font-weight:500}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+/* market */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.item .thumb{aspect-ratio:4/3;background:var(--surface-2);display:grid;place-items:center;position:relative;overflow:hidden}
+.item .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.item .thumb .glyph{width:64px;height:64px;color:color-mix(in oklab,var(--accent) 70%,var(--muted))}
+.item .thumb .badges{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;gap:6px}
+.item .thumb .pill{background:var(--surface);box-shadow:var(--shadow)}
+.item .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.item .meta{font-size:.82rem;color:var(--muted)}
+.item .foot{margin-top:auto;padding-top:8px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.clock{font-family:var(--f-mono);font-size:.78rem;font-weight:700}
+.clock.low{color:var(--warn)}
+.wish{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.wish .w-ico{width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.wish .w-ico svg{width:17px;height:17px}
+
+/* stats */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi .v{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .v small{font-family:var(--f-body);font-size:.85rem;font-weight:600;color:var(--muted);margin-left:3px}
+.delta{font-size:.8rem;font-weight:700;color:var(--reuse)}
+.delta.neg{color:var(--danger)}
+.two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;height:auto;min-width:420px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hbar{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) auto;gap:10px;align-items:center;font-size:.88rem}
+.hbar .track{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden;display:flex}
+.hbar .track i{display:block;height:100%}
+.hbar .num{font-family:var(--f-mono);font-size:.82rem;font-variant-numeric:tabular-nums;min-width:60px;text-align:right}
+.hbar.me .lbl{font-weight:700;color:var(--accent)}
+.heat{display:grid;gap:4px;min-width:520px}
+.heat .c{aspect-ratio:1.7;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.74rem;font-weight:700}
+.heat .lbl{font-size:.82rem;font-weight:600;display:flex;align-items:center;white-space:nowrap;padding-right:6px}
+.heat .wk{font-size:.72rem;color:var(--muted);text-align:center;font-family:var(--f-mono)}
+
+table.t{width:100%;border-collapse:collapse;font-size:.88rem;min-width:600px}
+.t th{text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+.t td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.t td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
+.t th.n{text-align:right}
+.tablewrap{overflow-x:auto}
+
+.ledger{display:flex;flex-direction:column}
+.ledger div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.ledger div:last-child{border-bottom:0}
+.plus{color:var(--reuse);font-family:var(--f-mono);font-weight:700}
+.minus{color:var(--danger);font-family:var(--f-mono);font-weight:700}
+
+.rewards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.reward{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
+.reward .cost{font-family:var(--f-mono);font-weight:700;color:var(--accent)}
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.rules{grid-template-columns:minmax(0,1fr)}}
+.rule{border-radius:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line)}
+.rule .p{font-family:var(--f-display);font-weight:800;font-size:1.5rem}
+.rule.reuse .p{color:var(--reuse)} .rule.recycle .p{color:var(--recycle)} .rule.receive .p{color:var(--accent)}
+
+.show{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+.ba{display:grid;grid-template-columns:1fr 1fr;height:120px}
+.ba div{display:flex;align-items:flex-end;padding:8px 10px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;position:relative;overflow:hidden}
+.ba .b{background:repeating-linear-gradient(45deg,var(--surface-2) 0 8px,color-mix(in oklab,var(--muted) 18%,var(--surface-2)) 8px 16px);color:var(--muted)}
+.ba .a{background:color-mix(in oklab,var(--accent) 22%,var(--surface));color:var(--accent)}
+.ba svg{position:absolute;inset:14px 14px 26px;width:calc(100% - 28px);height:calc(100% - 40px)}
+.proj .body{padding:14px;display:flex;flex-direction:column;gap:6px}
+
+/* overlays */
+.scrim{position:fixed;inset:0;background:rgba(10,16,12,.45);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.sheet{background:var(--surface);border-radius:18px;max-width:440px;width:100%;max-height:calc(100% - 32px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.qr{align-self:center;padding:12px;background:#fff;border-radius:12px;border:1px solid var(--line)}
+.qr img,.qr canvas{display:block;width:200px;height:200px}
+.code{font-family:var(--f-mono);font-size:1.5rem;font-weight:700;letter-spacing:.2em;text-align:center}
+.viewfinder{aspect-ratio:1;max-width:260px;width:100%;align-self:center;border-radius:16px;background:#0b0f0d;position:relative;overflow:hidden}
+.viewfinder::before{content:"";position:absolute;inset:18%;border:3px solid #43C08F;border-radius:12px}
+.viewfinder::after{content:"";position:absolute;left:18%;right:18%;height:2px;background:#43C08F;top:20%;box-shadow:0 0 12px #43C08F;animation:vf 1.6s ease-in-out infinite alternate}
+@keyframes vf{to{top:80%}}
+@media (prefers-reduced-motion:reduce){.viewfinder::after{animation:none;top:50%}}
+.notif{display:flex;flex-direction:column;gap:2px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.notif.unread b::before{content:"";display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:7px;vertical-align:2px}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:.92rem}
+@media (min-width:821px){.toast{bottom:28px}}
+.banner{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:color-mix(in oklab,var(--warn) 14%,var(--surface));border:1px solid color-mix(in oklab,var(--warn) 40%,var(--line));font-size:.9rem}
+.banner svg{width:19px;height:19px;flex:none;color:var(--warn);margin-top:1px}
+.flowrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
+.flowrow span.s{background:var(--surface-2);padding:3px 9px;border-radius:999px;font-weight:600}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" style="fill:var(--accent)"/><path d="M10 17.5a6 6 0 0 1 10.4-4.1M22 14.5a6 6 0 0 1-10.4 4.1" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M20.6 9.6v3.9h-3.9M11.4 22.4v-3.9h3.9" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>WasteLoop <small>· Elmina township</small></span>
+    </div>
+    <div class="spacer"></div>
+    <div class="seg" role="group" aria-label="View as">
+      <button id="role-res" data-act="role" data-v="resident">Resident</button>
+      <button id="role-adm" data-act="role" data-v="admin">SDP Admin</button>
+    </div>
+    <button class="pts-chip" id="ptsChip" data-act="go" data-v="rewards"></button>
+    <button class="iconbtn" id="bell" data-act="notifs" aria-label="Notifications"></button>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="Sections"></nav>
+  <main id="main"></main>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+<div id="overlay"></div>
+<div id="toastHost"></div>
+
+<script>
+(()=>{
+/* ---------- icons ---------- */
+const I = {
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></svg>',
+  market:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM4 9c0 1.7 1.3 3 3 3s3-1.3 3-3m0 0c0 1.7 1.3 3 2 3s2-1.3 2-3m0 0c0 1.7 1.3 3 3 3s3-1.3 3-3M10 20v-5h4v5"/></svg>',
+  leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l8-8"/></svg>',
+  gift:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v8h14v-8M12 8v12M12 8S10.5 4 8 4.5 7 8 12 8zm0 0s1.5-4 4-3.5S17 8 12 8z"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg>',
+  hammer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V11h14v10M9 21v-5h6v5M3 11l9-6 9 6"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  qr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2M20 14v.01M14 20h.01M17 17h3v3h-3z"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  reuse:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg>',
+  recycle:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4l3-5M17 19h3l-3-5M9 5l3-2 3 5M9 19h6M6.5 14L9 9.5M17.5 14L15 9.5"/></svg>',
+  dispose:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>',
+};
+const CAT = {
+  furniture:{label:'Furniture',reuse:1.8,recycle:0.4,p:'M6 3v9h12V3M5 12h14M6 12v9M18 12v9M6 17h12'},
+  appliances:{label:'Appliances',reuse:4.5,recycle:1.6,p:'M5 3h14v18H5zM5 8h14M9 5.5h.01M12 14m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0'},
+  electronics:{label:'Electronics',reuse:20,recycle:2.5,p:'M3 4h18v12H3zM9 20h6M12 16v4'},
+  textiles:{label:'Clothing & textiles',reuse:12,recycle:2,p:'M8 3L3 7l3 3 2-1v12h8V9l2 1 3-3-5-4c-1 2-7 2-8 0z'},
+  books_paper:{label:'Books & paper',reuse:1.1,recycle:0.9,p:'M3 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H3zM21 5h-7a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h7z'},
+  plastics:{label:'Plastics',reuse:2.5,recycle:1.4,p:'M10 2h4v3l2 3v13H8V8l2-3zM8 12h8'},
+  metal:{label:'Metal',reuse:5,recycle:3.5,p:'M6 5c0-1.1 2.7-2 6-2s6 .9 6 2v14c0 1.1-2.7 2-6 2s-6-.9-6-2zM6 5c0 1.1 2.7 2 6 2s6-.9 6-2'},
+  glass:{label:'Glass',reuse:1,recycle:0.3,p:'M8 3h8M9 3v3l-2 3v12h10V9l-2-3V3M7 13h10'},
+  toys_sports:{label:'Toys & sports',reuse:3.5,recycle:1,p:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M3.5 9.5c5 2 12 2 17 0M3.5 14.5c5-2 12-2 17 0'},
+  kitchenware:{label:'Kitchenware',reuse:3,recycle:1.5,p:'M4 10h16v4a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6zM2 10h2M20 10h2M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2'},
+  other:{label:'Other',reuse:2,recycle:0.5,p:'M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10'},
+};
+const glyph = c => `<svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="${(CAT[c]||CAT.other).p}"/></svg>`;
+const ZONES = ['Elmina Green 1','Elmina Green 2','Elmina West','Elmina East','Elmina Lakeside'];
+const PTS = {reuse:50, receive:10, recycle:20};
+const DAY = 864e5, LIST_DAYS = 7, WARN_DAYS = 2;
+
+/* ---------- utils ---------- */
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = p => p+'_'+Math.random().toString(36).slice(2,9);
+const fmt = (n,d=0) => Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:d,maximumFractionDigits:d});
+const kg = n => n>=1000 ? fmt(n/1000,2)+' t' : fmt(n,n<10?1:0)+' kg';
+const code6 = () => Array.from({length:6},()=> 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const routeName = r => ({reuse:'Reuse',recycle:'Recycle',dispose:'Dispose'}[r]||r);
+
+/* ---------- state ---------- */
+const KEY = 'wasteloop-proto-v1';
+let S;
+const now = () => Date.now() + (S?.dayOffset||0)*DAY;
+const monthKey = t => { const d=new Date(t); return d.getFullYear()*12+d.getMonth(); };
+const weekIdx = t => Math.floor((now()-t)/(7*DAY)); // 0 = this week
+
+function seed(){
+  const t = Date.now(), r = rng(42);
+  const users = [
+    {id:'me',name:'You',zone:'Elmina Green 2'},
+    {id:'u1',name:'Farid A.',zone:'Elmina East'},
+    {id:'u2',name:'Mei Ling T.',zone:'Elmina Green 2'},
+    {id:'u3',name:'Rajesh K.',zone:'Elmina West'},
+    {id:'u4',name:'Nurul H.',zone:'Elmina Lakeside'},
+    {id:'u5',name:'Daniel W.',zone:'Elmina Green 1'},
+  ];
+  const L = (o)=>Object.assign({id:uid('l'),photo:null,mode:'free',swapFor:'',status:'open',claimerId:null,code:code6(),warned:false,sample:true},o);
+  const listings = [
+    L({ownerId:'u1',title:'Rattan armchair',category:'furniture',description:'Sturdy rattan armchair with cushion. Small scuff on the left arm, otherwise solid.',condition:'good',route:'reuse',weightKg:7,valueRm:120,zone:'Elmina East',createdAt:t-3*DAY,expiresAt:t+4*DAY}),
+    L({ownerId:'u2',title:'Kids\' bicycle, 16-inch',category:'toys_sports',description:'Blue 16-inch bike with training wheels. Tyres recently pumped.',condition:'good',route:'reuse',weightKg:9,valueRm:150,mode:'swap',swapFor:'Toddler car seat',zone:'Elmina Green 2',createdAt:t-2*DAY,expiresAt:t+5*DAY}),
+    L({ownerId:'u3',title:'Microwave oven, 20L',category:'appliances',description:'Working Sharp-style 20L microwave. Moving house and the new place has a built-in one.',condition:'good',route:'reuse',weightKg:12,valueRm:180,zone:'Elmina West',createdAt:t-5.6*DAY,expiresAt:t+1.4*DAY,warned:true}),
+    L({ownerId:'u4',title:'SPM reference books (set of 9)',category:'books_paper',description:'Form 4 and 5 science and maths references, light pencil notes.',condition:'fair',route:'reuse',weightKg:6,valueRm:80,zone:'Elmina Lakeside',createdAt:t-1*DAY,expiresAt:t+6*DAY}),
+    L({ownerId:'u5',title:'Study desk with drawer',category:'furniture',description:'Particle-board desk, 100 cm wide. One drawer runner is stiff.',condition:'fair',route:'reuse',weightKg:18,valueRm:70,zone:'Elmina Green 1',createdAt:t-0.5*DAY,expiresAt:t+6.5*DAY}),
+    L({ownerId:'me',title:'Wooden bookshelf, 4-tier',category:'furniture',description:'Solid wood bookshelf, 4 shelves, 150 cm tall. Some sun fading on the side.',condition:'good',route:'reuse',weightKg:15,valueRm:90,zone:'Elmina Green 2',createdAt:t-5.3*DAY,expiresAt:t+1.7*DAY,warned:true}),
+    L({ownerId:'u5',title:'Cracked plastic storage drawers',category:'plastics',description:'3-tier PP drawers, cracked frame.',condition:'broken',route:'recycle',weightKg:4,valueRm:0,zone:'Elmina Green 1',createdAt:t-9*DAY,expiresAt:t-2*DAY,status:'routed',routedAt:t-2*DAY}),
+    L({ownerId:'u1',title:'Old CRT monitor',category:'electronics',description:'17-inch CRT monitor, not powering on.',condition:'broken',route:'recycle',weightKg:14,valueRm:0,zone:'Elmina East',createdAt:t-10*DAY,expiresAt:t-3*DAY,status:'scheduled',routedAt:t-3*DAY,pickupDate:new Date(t+2*DAY).toISOString().slice(0,10)}),
+    L({ownerId:'u3',title:'Office swivel chair',category:'furniture',description:'Mesh chair, gas lift broken.',condition:'worn',route:'reuse',weightKg:11,valueRm:40,zone:'Elmina West',createdAt:t-12*DAY,expiresAt:t-5*DAY,status:'routed',routedAt:t-5*DAY}),
+  ];
+  // historical aggregates (sample) for previous 6 months per zone
+  const history = [], weekly = [];
+  const mNow = monthKey(t);
+  ZONES.forEach((z,zi)=>{
+    const base = 70 + zi*18 + r()*30;
+    for(let m=6;m>=1;m--){
+      const g = Math.pow(1.11,6-m);
+      const reuseKg = Math.round(base*g*(0.85+r()*0.3));
+      const recycleKg = Math.round((base*1.5)*g*(0.85+r()*0.3));
+      const items = Math.round(reuseKg/7);
+      history.push({zone:z,month:mNow-m,reuseKg,recycleKg,items,valueRm:items*Math.round(55+r()*30),
+        co2:Math.round(reuseKg*2.4+recycleKg*0.9)});
+    }
+    for(let w=1;w<=7;w++) weekly.push({zone:z,week:w,count:Math.round((4+zi*2.2+r()*9)*(1+(7-w)*0.06))});
+  });
+  return {
+    v:1, dayOffset:0, role:'resident', view:'snap', adminView:'esg', marketTab:'feed', cat:'all',
+    users, listings, history, weekly, weighins:[],
+    points:{me:140,u1:310,u2:260,u3:175,u4:220,u5:95},
+    ledger:[
+      {userId:'me',pts:50,reason:'Reuse handover: baby bouncer',at:t-20*DAY},
+      {userId:'me',pts:20,reason:'Recycled: old printer',at:t-14*DAY},
+      {userId:'me',pts:10,reason:'Received: rice cooker',at:t-9*DAY},
+      {userId:'me',pts:50,reason:'Reuse handover: dining chairs',at:t-6*DAY},
+      {userId:'me',pts:10,reason:'Received: shoe rack',at:t-4*DAY},
+    ],
+    mine:{kg:31,items:3,co2:58},
+    wishlist:[
+      {id:uid('w'),userId:'me',text:'Baby high chair',category:'furniture',at:t-3*DAY},
+      {id:uid('w'),userId:'u4',text:'Study desk',category:'furniture',at:t-6*DAY},
+    ],
+    rewards:[
+      {id:'r1',name:'RM10 voucher',partner:'Elmina Lakeside Mall',cost:300},
+      {id:'r2',name:'Sapling for your garden',partner:'SDP Landscape',cost:80},
+      {id:'r3',name:'1 hr community hall booking',partner:'Elmina Clubhouse',cost:150},
+      {id:'r4',name:'Reusable tote bag',partner:'WasteLoop',cost:60},
+      {id:'r5',name:'Free kopi for a week',partner:'Elmina Square café',cost:200},
+    ],
+    redemptions:[],
+    showcase:[
+      {id:'s1',title:'Lakeside gazebo',material:'Formwork timber offcuts',kg:1450,location:'Elmina Lakeside park',date:'2026-07',shape:'gazebo',note:'Built from plywood and timber formwork left over from Phase 3 construction.'},
+      {id:'s2',title:'Jogging-track benches',material:'Precast concrete kerbs',kg:2300,location:'Elmina Central Park track',date:'2026-05',shape:'bench',note:'Rejected kerb units cut and capped as 14 seating stops along the 3 km loop.'},
+      {id:'s3',title:'Community planter boxes',material:'Pallet wood and rebar',kg:620,location:'Elmina Green 2 surau garden',date:'2026-09',shape:'planter',note:'Residents grow serai, pandan and chilli in 24 raised beds.'},
+    ],
+    notifs:[
+      {id:uid('n'),userId:'me',text:'Your “Wooden bookshelf, 4-tier” will be routed to SDP recycling in 2 days unless a neighbour claims it.',at:t-0.3*DAY,read:false},
+      {id:uid('n'),userId:'admin',text:'2 items auto-routed to the collection queue this week.',at:t-2*DAY,read:false},
+    ],
+  };
+}
+function load(){ try{ const j = JSON.parse(localStorage.getItem(KEY)); if(j && j.v===1) return j; }catch(e){} return seed(); }
+function save(){ try{ const c = structuredClone(S); localStorage.setItem(KEY, JSON.stringify(c)); }catch(e){ try{ // drop photos if over quota
+  const c = structuredClone(S); c.listings.forEach(l=>{ if(l.photo && l.status!=='open') l.photo=null; }); localStorage.setItem(KEY, JSON.stringify(c)); }catch(_){} } }
+S = load();
+
+/* ---------- transient UI state ---------- */
+const U = { snap:{stage:'idle', photo:null, blob:null, desc:'', result:null, err:'', chat:[], chatBusy:false, mode:'free', swapFor:'', route:null}, sample:undefined, imgOk:true, ctl:null };
+/* AI lives behind this app's own server functions (/api/*), so no Claude login is needed on the phone. */
+async function api(path, body, signal){
+  const r = await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw {code:j?.code||(r.status===429?'rate_limited':'upstream_error'), message:j?.error||('HTTP '+r.status)};
+  return j;
+}
+U.sample = { json:(prompt,opts={})=>api('api/analyze',{prompt,image:opts.imageData||null},opts.signal).then(j=>j.result) };
+(async()=>{
+  try{ const r = await fetch('api/health',{cache:'no-store'}); const j = await r.json(); if(!j.ai) U.sample=null; }
+  catch(e){ U.sample = null; }
+  render();
+})();
+
+/* ---------- domain ---------- */
+const user = id => S.users.find(u=>u.id===id) || {name:'Neighbour',zone:'—'};
+const co2For = (cat,route,w) => Math.round(((CAT[cat]||CAT.other)[route==='recycle'?'recycle':'reuse']||0)*w*10)/10;
+function notify(userId,text){ S.notifs.unshift({id:uid('n'),userId,text,at:now(),read:false}); }
+function award(userId,pts,reason){ S.points[userId]=(S.points[userId]||0)+pts; S.ledger.unshift({userId,pts,reason,at:now()}); }
+function processClock(){
+  const t = now(); let routed = 0;
+  S.listings.forEach(l=>{
+    if(l.status!=='open') return;
+    const left = l.expiresAt - t;
+    if(left<=0){ l.status='routed'; l.routedAt=t; routed++;
+      notify(l.ownerId,`No one claimed “${l.title}”, so it has been routed to SDP recycling collection. You'll get ${PTS.recycle} points when it's collected.`);
+    } else if(left<=WARN_DAYS*DAY && !l.warned){ l.warned=true;
+      notify(l.ownerId,`“${l.title}” will be routed to SDP recycling in 2 days unless a neighbour claims it.`);
+    }
+  });
+  if(routed) notify('admin',`${routed} unclaimed item${routed>1?'s':''} auto-routed to the collection queue.`);
+}
+function matchWishes(l){
+  const words = (l.title+' '+l.description).toLowerCase();
+  S.wishlist.forEach(w=>{
+    if(w.userId===l.ownerId) return;
+    const ws = w.text.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>3);
+    const hit = ws.some(x=>words.includes(x)) || (ws.length===0 && w.category===l.category);
+    if(hit) notify(w.userId,`Wishlist match: “${l.title}” was just posted in ${l.zone}. It matches your request for “${w.text}”.`);
+  });
+}
+function liveStats(){
+  // events from this prototype (current period)
+  const ev = [];
+  S.listings.forEach(l=>{
+    if(l.status==='reused') ev.push({zone:l.zone,at:l.doneAt,reuseKg:l.weightKg,recycleKg:0,items:1,valueRm:l.valueRm,co2:co2For(l.category,'reuse',l.weightKg),cat:l.category});
+    if(l.status==='recycled') ev.push({zone:l.zone,at:l.doneAt,reuseKg:0,recycleKg:l.weightKg,items:0,valueRm:0,co2:co2For(l.category,'recycle',l.weightKg),cat:l.category});
+  });
+  S.weighins.forEach(w=>ev.push({zone:w.zone,at:w.at,reuseKg:0,recycleKg:w.kg,items:0,valueRm:0,co2:Math.round(w.kg*0.9*10)/10,cat:w.material}));
+  return ev;
+}
+function esg(){
+  const ev = liveStats(), mNow = monthKey(now());
+  const months = []; for(let m=5;m>=0;m--) months.push(mNow-m);
+  const byMonth = months.map(mk=>{
+    const h = S.history.filter(x=>x.month===mk), e = ev.filter(x=>monthKey(x.at)===mk);
+    const sum = k => h.reduce((a,b)=>a+b[k],0)+e.reduce((a,b)=>a+b[k],0);
+    return {mk,reuseKg:sum('reuseKg'),recycleKg:sum('recycleKg'),items:sum('items'),valueRm:sum('valueRm'),co2:sum('co2')};
+  });
+  const all = [...S.history,...ev];
+  const tot = k => all.reduce((a,b)=>a+(b[k]||0),0);
+  const byZone = ZONES.map(z=>{ const a=all.filter(x=>x.zone===z); return {zone:z,reuseKg:a.reduce((s,x)=>s+x.reuseKg,0),recycleKg:a.reduce((s,x)=>s+x.recycleKg,0)}; });
+  return {byMonth,byZone,ev,total:{kg:tot('reuseKg')+tot('recycleKg'),items:tot('items'),valueRm:tot('valueRm'),co2:tot('co2'),reuseKg:tot('reuseKg'),recycleKg:tot('recycleKg')}};
+}
+
+/* ---------- AI ---------- */
+const CATS = Object.keys(CAT);
+function aiPrompt(desc){
+  return `You are the sorting assistant inside WasteLoop, a reuse-and-recycle app for residents of a Sime Darby Property township (Elmina, Selangor, Malaysia). A resident ${desc?`described an item they no longer want: "${desc.slice(0,600)}"`:'attached a photo of an item they no longer want'}${desc&&U.snap.blob?' and also attached a photo of it':''}. Decide its best route following the 3R hierarchy: Reuse first, Recycle second, Dispose only as a last resort.
+
+- "reuse": usable as-is or after a simple clean or fix; a neighbour would plausibly want it for free or as a swap.
+- "recycle": broken, worn out or unlikely to be wanted, but its materials fit Malaysian recycling streams (paper, plastics, metal, glass, e-waste, textiles, bulky wood/furniture).
+- "dispose": contaminated, hazardous or not recyclable. For hazardous items (batteries, paint, fluorescent tubes, chemicals, gas canisters) explain safe disposal in handling_tip.
+
+Reply with only one JSON object, no other text:
+{"is_item": true, "item": "short name, max 6 words", "category": one of ${JSON.stringify(CATS)}, "description": "1-2 sentence listing description written for neighbours, mention visible condition", "condition": "good"|"fair"|"worn"|"broken", "route": "reuse"|"recycle"|"dispose", "confidence": number 0-1, "reason": "1-2 plain sentences on why this route", "material": "main material", "est_weight_kg": number, "est_value_rm": second-hand value in Malaysian ringgit (0 if not reusable), "handling_tip": "one practical tip: cleaning before handover, which recycling stream, or safe disposal"}
+If the ${desc?'description':'photo'} does not show a household item someone could give away or discard, set "is_item": false and fill other fields with your best guess.`;
+}
+async function toBlobs(file){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
+    const mk = (max,q)=>{ const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)); const c=document.createElement('canvas');
+      c.width=Math.round(img.naturalWidth*s); c.height=Math.round(img.naturalHeight*s); c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c; };
+    const blob = mk(1024).toDataURL('image/jpeg',0.82).split(',')[1]; // base64 sent to the AI server
+    const thumb = mk(420).toDataURL('image/jpeg',0.72);
+    return {blob,thumb};
+  } finally { URL.revokeObjectURL(url); }
+}
+async function analyze(){
+  const sn = U.snap;
+  if(!U.sample){ sn.stage='error'; sn.err='The AI server is not connected yet (see the README to add your API key). You can choose a route yourself for now.'; render(); return; }
+  sn.stage='analyzing'; sn.err=''; sn.chat=[]; render();
+  U.ctl = new AbortController();
+  try{
+    const opts = {signal:U.ctl.signal};
+    if(sn.blob) opts.imageData=sn.blob;
+    const j = await U.sample.json(aiPrompt(sn.desc.trim()), opts);
+    if(!j || typeof j!=='object') throw {code:'invalid_json'};
+    const route = ['reuse','recycle','dispose'].includes(j.route)? j.route : 'recycle';
+    sn.result = {
+      isItem: j.is_item!==false, item:String(j.item||'Unnamed item').slice(0,60),
+      category: CATS.includes(j.category)? j.category:'other', description:String(j.description||''),
+      condition:String(j.condition||'fair'), route, confidence:Math.max(0,Math.min(1,Number(j.confidence)||0.6)),
+      reason:String(j.reason||''), material:String(j.material||'—'),
+      weightKg:Math.max(0.1,Number(j.est_weight_kg)||1), valueRm:Math.max(0,Math.round(Number(j.est_value_rm)||0)),
+      tip:String(j.handling_tip||''),
+    };
+    sn.route = route; sn.title = sn.result.item; sn.descEdit = sn.result.description;
+    sn.stage='result';
+  }catch(e){
+    if(e?.code==='cancelled'||e?.name==='AbortError'){ sn.stage='idle'; }
+    else if(e instanceof TypeError){ sn.stage='error'; sn.err='No internet connection. AI sorting needs to be online; your listings and points still work offline.'; }
+    else { sn.stage='error'; sn.err = errCopy(e?.code); }
+  }
+  render();
+}
+function errCopy(code){
+  return ({not_configured:'The AI server has no API key yet. Add ANTHROPIC_API_KEY in your hosting settings (see README).',
+    not_granted:'AI sorting needs your permission to use Claude. Reload the page and allow it to try again.',
+    sampling_disabled:'Claude is not available for this account, so AI sorting is off. Choose a route yourself below.',
+    rate_limited:'Too many requests just now. Wait a minute and try again.',
+    image_rejected:'That photo could not be read. Try a JPEG or PNG under 20 MB.',
+    images_unavailable:'Photos cannot be sent to AI in this view. Describe the item in words instead.',
+    refused:'The AI could not assess this one. Try a different photo or description.',
+    invalid_json:'The AI reply came back garbled. Try again.',
+    session_expired:'Your session expired. Sign in to Claude again, then retry.'})[code] || 'Something went wrong reaching the AI. Try again.';
+}
+async function askWhy(q){
+  const sn = U.snap; if(!U.sample || sn.chatBusy || !q.trim()) return;
+  sn.chat.push({role:'user',content:q.trim()}); sn.chat.push({role:'assistant',content:'',pending:true}); sn.chatBusy=true; render();
+  const ctx = `You are WasteLoop's sorting assistant for a Malaysian township (Sime Darby Property, Elmina). You assessed a resident's unwanted item:
+${JSON.stringify({item:sn.result.item,category:sn.result.category,condition:sn.result.condition,material:sn.result.material,route:sn.result.route,reason:sn.result.reason,weight_kg:sn.result.weightKg,value_rm:sn.result.valueRm})}
+Points: reuse handover ${PTS.reuse}, recycling ${PTS.recycle}, dispose 0. Unclaimed marketplace items auto-route to SDP recycling after ${LIST_DAYS} days.
+Answer the resident's questions briefly (2-4 sentences), practically, in plain English. No markdown headings.`;
+  const turns = [{role:'user',content:ctx}, ...sn.chat.filter(m=>!m.pending).map(m=>({role:m.role,content:m.content}))];
+  const bubble = sn.chat[sn.chat.length-1];
+  try{
+    const {text} = await api('api/chat',{messages:turns});
+    bubble.content=text;
+  }catch(e){ bubble.content = e?.text || errCopy(e?.code); }
+  bubble.pending=false; sn.chatBusy=false; render();
+  const box=document.getElementById('chatq'); if(box) box.focus();
+}
+function resetSnap(){ U.snap={stage:'idle',photo:null,blob:null,desc:'',result:null,err:'',chat:[],chatBusy:false,mode:'free',swapFor:'',route:null}; }
+
+/* ---------- render: shell ---------- */
+const RES_NAV = [['snap','Snap',I.camera],['market','Market',I.market],['impact','Impact',I.leaf],['rewards','Rewards',I.gift]];
+const ADM_NAV = [['esg','ESG',I.chart],['heat','Heatmap',I.grid],['collect','Collection',I.truck],['manage','Listings',I.list],['show','Showcase',I.hammer]];
+function render(){
+  const isAdm = S.role==='admin';
+  document.getElementById('role-res').setAttribute('aria-pressed',String(!isAdm));
+  document.getElementById('role-adm').setAttribute('aria-pressed',String(isAdm));
+  const pc = document.getElementById('ptsChip'); pc.hidden = isAdm;
+  pc.innerHTML = `${I.leaf.replace('<svg','<svg width="15" height="15"')}<span class="mono">${fmt(S.points.me)}</span> pts`;
+  const who = isAdm?'admin':'me';
+  const unread = S.notifs.filter(n=>n.userId===who && !n.read).length;
+  document.getElementById('bell').innerHTML = I.bell + (unread?`<span class="dot">${unread}</span>`:'');
+  const nav = isAdm?ADM_NAV:RES_NAV, cur = isAdm?S.adminView:S.view;
+  const navHtml = nav.map(([k,l,ic])=>`<button data-act="go" data-v="${k}" ${k===cur?'aria-current="page"':''}>${ic}<span>${l}</span></button>`).join('');
+  document.getElementById('rail').innerHTML = navHtml + `<div class="rail-foot"><span class="eyebrow">Prototype controls</span>
+    <span class="small muted">Demo clock: <b class="mono">day +${S.dayOffset}</b></span>
+    <button class="btn sm" data-act="skip">Skip ahead 1 day</button>
+    <button class="btn sm ghost" data-act="reset">Reset demo data</button></div>`;
+  document.getElementById('tabbar').innerHTML = navHtml;
+  const m = document.getElementById('main');
+  const views = isAdm ? {esg:vESG,heat:vHeat,collect:vCollect,manage:vManage,show:vShowAdmin} : {snap:vSnap,market:vMarket,impact:vImpact,rewards:vRewards};
+  m.innerHTML = (views[cur]||Object.values(views)[0])();
+  afterRender();
+}
+function afterRender(){
+  document.querySelectorAll('[data-qr]').forEach(el=>{
+    if(el.dataset.done) return; el.dataset.done='1';
+    if(window.QRCode){ try{ new QRCode(el,{text:el.dataset.qr,width:200,height:200,colorDark:'#0B1A12',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
+    else el.innerHTML='<p class="small muted">QR unavailable</p>';
+  });
+  const dz = document.getElementById('drop');
+  if(dz){ ['dragenter','dragover'].forEach(e=>dz.addEventListener(e,ev=>{ev.preventDefault();dz.classList.add('over')}));
+    ['dragleave','drop'].forEach(e=>dz.addEventListener(e,()=>dz.classList.remove('over'))); }
+  const cl = document.getElementById('chatlog'); if(cl) cl.scrollTop = cl.scrollHeight;
+}
+
+/* ---------- resident: snap ---------- */
+function vSnap(){
+  const sn = U.snap;
+  const standalone = window.navigator.standalone===true || matchMedia('(display-mode: standalone)').matches;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let hideInstall=false; try{ hideInstall = localStorage.getItem('wl-install-dismissed')==='1'; }catch(e){}
+  const install = (!standalone && isIOS && !hideInstall) ? `<div class="install">${I.spark}<div style="flex:1">Install WasteLoop: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.</div><button class="btn sm ghost" data-act="dismiss-install">OK</button></div>` : '';
+  const aiNote = install + (U.sample===null ? `<div class="banner">${I.info}<div>AI sorting is offline right now (no connection, or the server's API key isn't set). You can still choose a route yourself after adding a photo or description.</div></div>` : '');
+  if(sn.stage==='analyzing') return `
+    <div class="page-head"><div><span class="eyebrow">AI Smart Snap</span><h1>Sorting your item…</h1></div>
+    <button class="btn" data-act="cancel-ai">Stop</button></div>
+    <div class="card analyzing">
+      ${sn.photo?`<div class="scanwrap"><img class="photo" src="${sn.photo}" alt="Your photo"></div>`:`<div class="scanwrap"><div class="photo" style="display:grid;place-items:center">${glyph('other')}</div></div>`}
+      <div class="stack"><h2>Checking reuse first</h2>
+        <p class="muted">The AI identifies the item, judges its condition and picks the best route in the 3R order: reuse, then recycle, then dispose. This usually takes 5 to 30 seconds.</p>
+        <div class="flowrow"><span class="s">Identify</span>→<span class="s">Condition</span>→<span class="s">Route</span>→<span class="s">Listing draft</span></div></div>
+    </div>`;
+  if(sn.stage==='result') return vResult();
+  return `
+  <div class="page-head"><div><span class="eyebrow">AI Smart Snap</span><h1>Got something you don't need?</h1>
+    <p class="muted" style="margin-top:6px">Snap it. The AI tells you whether a neighbour can reuse it, it should be recycled, or it has to go to disposal, and drafts the listing for you.</p></div></div>
+  ${aiNote}
+  ${sn.stage==='error'?`<div class="banner">${I.info}<div>${esc(sn.err)}${U.sample===null&&(sn.photo||sn.desc)?` <button class="btn sm" data-act="manual" style="margin-left:6px">Choose route myself</button>`:''}</div></div>`:''}
+  <div class="snap-grid">
+    <label class="drop" id="drop">
+      ${sn.photo?`<img class="photo" src="${sn.photo}" alt="Selected photo" style="max-width:240px">`:`<div class="lens">${I.camera}</div>`}
+      <h2>${sn.photo?'Photo ready':'Snap or upload a photo'}</h2>
+      <p class="muted small">${sn.photo?'Tap to choose a different photo':'On your phone this opens the camera. On a computer, choose a file or drop it here.'}</p>
+      <input type="file" id="photo" accept="image/*" capture="environment" aria-label="Photo of item">
+    </label>
+    <div class="card stack">
+      <h3>Add a few words <span class="muted small" style="font-weight:500">(optional, or instead of a photo)</span></h3>
+      <textarea id="desc" placeholder="e.g. 3-seater fabric sofa, 6 years old, one cushion has a stain">${esc(sn.desc)}</textarea>
+      <div class="chips">${['IKEA-style bookshelf, one shelf warped','Box of old phone chargers and cables','Used AA batteries, about 20','Baby clothes 0–6 months, washed'].map(x=>`<button class="chip" data-act="ex" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>
+      <button class="btn primary" data-act="analyze" ${sn.photo||sn.desc.trim()?'':'disabled'} id="goBtn">${I.spark} Sort it with AI</button>
+    </div>
+  </div>
+  <section class="stack">
+    <span class="eyebrow">Where items go</span>
+    <div class="routes3">
+      <div class="route-key reuse"><b>Reuse · +${PTS.reuse} pts</b><span class="small muted">Listed free or as a swap for neighbours. Points land when they scan your handover QR.</span></div>
+      <div class="route-key recycle"><b>Recycle · +${PTS.recycle} pts</b><span class="small muted">SDP collects it. Unclaimed listings auto-route here after ${LIST_DAYS} days, with a reminder 2 days before.</span></div>
+      <div class="route-key dispose"><b>Dispose · 0 pts</b><span class="small muted">Only for contaminated or hazardous items. You get safe disposal steps.</span></div>
+    </div>
+  </section>`;
+}
+function vResult(){
+  const sn = U.snap, r = sn.result, route = sn.route;
+  const co2 = co2For(r.category,route,r.weightKg);
+  const changed = route!==r.route;
+  let action = '';
+  if(route==='reuse') action = `
+    <div class="card stack"><h3>Post to the marketplace</h3>
+      <label class="f">Title<input type="text" id="lt" value="${esc(sn.title)}"></label>
+      <label class="f">Description<textarea id="ld">${esc(sn.descEdit)}</textarea></label>
+      <div class="row"><div class="seg" role="group" aria-label="Offer type">
+        <button data-act="mode" data-v="free" aria-pressed="${sn.mode==='free'}">Free</button>
+        <button data-act="mode" data-v="swap" aria-pressed="${sn.mode==='swap'}">Swap</button></div>
+        <span class="small muted">No money changes hands on WasteLoop.</span></div>
+      ${sn.mode==='swap'?`<label class="f">What would you swap it for?<input type="text" id="sf" value="${esc(sn.swapFor)}" placeholder="e.g. a study lamp"></label>`:''}
+      <p class="small muted">Pickup from ${esc(user('me').zone)}. Open for ${LIST_DAYS} days, then routed to SDP recycling if no one claims it.</p>
+      <button class="btn primary" data-act="post">${I.market} Post listing</button></div>`;
+  else if(route==='recycle') action = `
+    <div class="card stack"><h3>Send to SDP recycling</h3>
+      <p class="muted">The item joins the SDP collection queue for ${esc(user('me').zone)}. Leave it at your unit's bin area on the scheduled day, or drop it at the Elmina Green collection point. You get ${PTS.recycle} points when SDP logs the pickup.</p>
+      <button class="btn primary" data-act="to-recycle">${I.truck} Add to collection queue</button></div>`;
+  else action = `
+    <div class="card stack"><h3>Dispose responsibly</h3>
+      <p class="muted">${esc(r.tip||'Bag it and place it in general waste on collection day.')}</p>
+      <p class="small muted">Disposal earns no points. If you think a part could still be reused or recycled, switch the route above.</p>
+      <button class="btn" data-act="done-dispose">Done</button></div>`;
+  return `
+  <div class="page-head"><div><span class="eyebrow">AI Smart Snap · result</span><h1>${esc(r.item)}</h1></div>
+    <button class="btn" data-act="new-snap">${I.camera} Snap another</button></div>
+  ${!r.isItem?`<div class="banner">${I.info}<div>The AI isn't sure this photo shows a household item. Check the details below or try another photo.</div></div>`:''}
+  <div class="card verdict">
+    ${sn.photo?`<img class="photo" src="${sn.photo}" alt="${esc(r.item)}">`:`<div class="photo" style="display:grid;place-items:center;color:var(--muted)">${glyph(r.category)}</div>`}
+    <div class="stack" style="gap:14px;min-width:0">
+      <div class="row" style="justify-content:space-between">
+        <span class="stamp ${route}"><span class="ico">${I[route]}</span>${routeName(route)}</span>
+        <div class="stack" style="gap:3px;align-items:flex-end"><span class="eyebrow">AI confidence</span>
+          <div class="row" style="gap:8px"><div class="meter"><i style="width:${Math.round(r.confidence*100)}%"></i></div><b class="mono small">${Math.round(r.confidence*100)}%</b></div></div>
+      </div>
+      <p>${esc(r.reason)}</p>
+      ${changed?`<p class="small" style="color:var(--warn)">You changed the route from the AI's suggestion (${routeName(r.route)}).</p>`:''}
+      <div class="row"><span class="small muted">Route:</span><div class="seg" role="group" aria-label="Route">
+        ${['reuse','recycle','dispose'].map(x=>`<button data-act="route" data-v="${x}" aria-pressed="${route===x}">${routeName(x)}</button>`).join('')}</div></div>
+      <div class="facts">
+        <div><span class="eyebrow">Category</span><b style="font-family:var(--f-body)">${esc(CAT[r.category].label)}</b></div>
+        <div><span class="eyebrow">Condition</span><b style="font-family:var(--f-body);text-transform:capitalize">${esc(r.condition)}</b></div>
+        <div><span class="eyebrow">Material</span><b style="font-family:var(--f-body)">${esc(r.material)}</b></div>
+        <div><span class="eyebrow">Est. weight</span><b>${fmt(r.weightKg,1)} kg</b></div>
+        <div><span class="eyebrow">Est. value</span><b>RM ${fmt(r.valueRm)}</b></div>
+        <div><span class="eyebrow">CO₂ avoided</span><b>${route==='dispose'?'0':fmt(co2,1)} kg</b></div>
+      </div>
+      ${r.tip?`<div class="tip">${I.info}<span>${esc(r.tip)}</span></div>`:''}
+    </div>
+  </div>
+  <div class="two">
+    ${action}
+    <div class="card stack"><h3>Ask the AI why</h3>
+      ${U.sample?`
+      <div class="chat" id="chatlog" style="max-height:280px;overflow:auto">
+        ${sn.chat.length?sn.chat.map((m,i)=>`<div class="bubble ${m.role==='user'?'me':'ai'}" ${i===sn.chat.length-1&&m.role==='assistant'?'id="lastBubble"':''}>${esc(m.pending&&!m.content?'Thinking…':m.content)}</div>`).join(''):`<p class="small muted">Not sure about the verdict? Ask a follow-up.</p>`}
+      </div>
+      <div class="chips">${['Why not reuse?','Can it be repaired?','Which recycling stream?','How should I clean it first?'].map(q=>`<button class="chip" data-act="ask" data-v="${q}">${q}</button>`).join('')}</div>
+      <form class="row" data-form="ask" style="flex-wrap:nowrap"><input type="text" id="chatq" placeholder="Type a question" ${sn.chatBusy?'disabled':''}><button class="btn primary sm" ${sn.chatBusy?'disabled':''}>Ask</button></form>`
+      :`<p class="small muted">Available when AI sorting is on.</p>`}
+    </div>
+  </div>`;
+}
+
+/* ---------- resident: market ---------- */
+function itemCard(l){
+  const owner = user(l.ownerId), mine = l.ownerId==='me', t = now();
+  const left = l.expiresAt - t, dleft = left/DAY;
+  const clock = l.status==='open' ? `<span class="clock ${dleft<=WARN_DAYS?'low':''}">${dleft>=1?Math.floor(dleft)+'d '+Math.floor((dleft%1)*24)+'h':Math.max(0,Math.floor(left/36e5))+'h'} left</span>` : '';
+  let act = '';
+  if(l.status==='open') act = mine ? `<button class="btn sm" data-act="sim-claim" data-v="${l.id}" title="Prototype: pretend a neighbour claims it">Simulate a claim</button>` : `<button class="btn sm primary" data-act="claim" data-v="${l.id}">${l.mode==='swap'?'Offer swap':"I'll take it"}</button>`;
+  else if(l.status==='reserved') act = mine ? `<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} Show QR</button>` : (l.claimerId==='me'?`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Scan at pickup</button>`:`<span class="pill neutral">Reserved</span>`);
+  const status = {open:'',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">To recycling</span>',scheduled:'<span class="pill recycle">Pickup scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[l.status]||'';
+  return `<article class="item">
+    <div class="thumb">${l.photo?`<img src="${l.photo}" alt="${esc(l.title)}">`:glyph(l.category)}
+      <div class="badges"><span class="pill ${l.mode==='swap'?'accent':'reuse'}">${l.mode==='swap'?'Swap':'Free'}</span>${status}</div></div>
+    <div class="body"><h3>${esc(l.title)}</h3>
+      <p class="small muted">${esc(l.description)}</p>
+      ${l.mode==='swap'&&l.swapFor?`<p class="small"><b>Wants:</b> ${esc(l.swapFor)}</p>`:''}
+      <p class="meta">${mine?'You':esc(owner.name)} · ${esc(l.zone)} · ~${fmt(l.weightKg,0)} kg ${l.sample?'· <span class="sample-tag">sample</span>':''}</p>
+      <div class="foot">${clock||'<span></span>'}${act}</div></div></article>`;
+}
+function vMarket(){
+  const tab = S.marketTab;
+  const cats = ['all',...new Set(S.listings.filter(l=>l.route==='reuse').map(l=>l.category))];
+  let body = '';
+  if(tab==='feed'){
+    const feed = S.listings.filter(l=>l.ownerId!=='me' && (l.status==='open'||(l.status==='reserved'&&l.claimerId==='me')) && (S.cat==='all'||l.category===S.cat)).sort((a,b)=>a.expiresAt-b.expiresAt);
+    body = `<div class="chips">${cats.map(c=>`<button class="chip" data-act="cat" data-v="${c}" aria-pressed="${S.cat===c}">${c==='all'?'All':esc(CAT[c].label)}</button>`).join('')}</div>
+      ${feed.length?`<div class="cards">${feed.map(itemCard).join('')}</div>`:`<div class="empty">Nothing in this category right now. Add it to your wishlist and the AI will tell you when a neighbour posts one.</div>`}`;
+  } else if(tab==='mine'){
+    const mine = S.listings.filter(l=>l.ownerId==='me').sort((a,b)=>b.createdAt-a.createdAt);
+    body = mine.length?`<div class="cards">${mine.map(itemCard).join('')}</div>`:`<div class="empty">You haven't posted anything yet. <button class="btn sm" data-act="go" data-v="snap">Snap an item</button></div>`;
+  } else {
+    const ws = S.wishlist.filter(w=>w.userId==='me');
+    body = `<div class="card stack"><h3>Looking for something?</h3><p class="small muted">Post it here before buying new. When a neighbour lists a match, you get a notification. This is the Reduce part of the 3Rs.</p>
+      <form class="row" data-form="wish" style="flex-wrap:nowrap"><input type="text" id="wishText" placeholder="e.g. Baby high chair"><button class="btn primary">Add</button></form></div>
+      <div class="stack">${ws.length?ws.map(w=>`<div class="wish"><span class="w-ico">${I.heart}</span><div style="flex:1;min-width:0"><b>${esc(w.text)}</b><div class="small muted">Watching since ${new Date(w.at).toLocaleDateString('en-MY',{day:'numeric',month:'short'})}</div></div><button class="btn sm ghost" data-act="unwish" data-v="${w.id}">Remove</button></div>`).join(''):`<div class="empty">Your wishlist is empty.</div>`}</div>
+      <div class="stack"><span class="eyebrow">Neighbours are looking for</span>${S.wishlist.filter(w=>w.userId!=='me').map(w=>`<div class="wish"><span class="w-ico">${I.heart}</span><div><b>${esc(w.text)}</b><div class="small muted">${esc(user(w.userId).name)} · ${esc(user(w.userId).zone)}</div></div></div>`).join('')}</div>`;
+  }
+  const res = S.listings.filter(l=>l.claimerId==='me'&&l.status==='reserved').length;
+  return `<div class="page-head"><div><span class="eyebrow">Circular marketplace</span><h1>From your neighbours</h1>
+    <p class="muted" style="margin-top:6px">Everything is free or a swap. Claim it, meet at pickup, scan the owner's QR to confirm.</p></div></div>
+    <div class="subtabs">${[['feed','Neighbours'+(res?` · ${res} reserved`:'')],['mine','My listings'],['wish','Wishlist']].map(([k,l])=>`<button data-act="mtab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
+    ${body}`;
+}
+
+/* ---------- resident: impact ---------- */
+function vImpact(){
+  const e = esg(), me = S.mine;
+  const maxZ = Math.max(...e.byZone.map(z=>z.reuseKg+z.recycleKg));
+  const myLedger = S.ledger.filter(x=>x.userId==='me').slice(0,8);
+  return `<div class="page-head"><div><span class="eyebrow">Impact</span><h1>What you've kept out of landfill</h1></div></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Diverted by you</span><span class="v">${fmt(me.kg,me.kg<10?1:0)}<small>kg</small></span></div>
+    <div class="kpi"><span class="eyebrow">Items reused</span><span class="v">${fmt(me.items)}</span></div>
+    <div class="kpi"><span class="eyebrow">CO₂ avoided</span><span class="v">${fmt(me.co2,0)}<small>kg</small></span></div>
+    <div class="kpi"><span class="eyebrow">Green points</span><span class="v">${fmt(S.points.me)}</span></div>
+  </div>
+  <div class="two">
+    <div class="card stack"><div class="row" style="justify-content:space-between"><h2>Elmina, phase by phase</h2><span class="sample-tag">includes sample data</span></div>
+      <p class="small muted">Total kg kept out of landfill since launch. Your phase is highlighted.</p>
+      <div class="stack">${e.byZone.slice().sort((a,b)=>(b.reuseKg+b.recycleKg)-(a.reuseKg+a.recycleKg)).map(z=>{const t=z.reuseKg+z.recycleKg;return `<div class="hbar ${z.zone===user('me').zone?'me':''}"><span class="lbl">${esc(z.zone)}</span><div class="track"><i style="width:${z.reuseKg/maxZ*100}%;background:var(--reuse)"></i><i style="width:${z.recycleKg/maxZ*100}%;background:var(--recycle)"></i></div><span class="num">${kg(t)}</span></div>`}).join('')}</div>
+      <div class="legend"><span><i style="background:var(--reuse)"></i>Reused</span><span><i style="background:var(--recycle)"></i>Recycled</span></div>
+      <p class="small">The whole township has diverted <b>${kg(e.total.kg)}</b> and avoided <b>${kg(e.total.co2)}</b> of CO₂.</p></div>
+    <div class="card stack"><h2>Your activity</h2>
+      <div class="ledger">${myLedger.map(x=>`<div><span>${esc(x.reason)}<br><span class="small muted">${new Date(x.at).toLocaleDateString('en-MY',{day:'numeric',month:'short'})}</span></span><span class="${x.pts>0?'plus':'minus'}">${x.pts>0?'+':''}${x.pts}</span></div>`).join('')}</div></div>
+  </div>
+  <section class="stack"><div class="page-head"><div><span class="eyebrow">SDP Showcase</span><h2>Construction waste, given a second life</h2></div></div>
+    <div class="show">${S.showcase.map(projCard).join('')}</div></section>`;
+}
+function shapeSvg(s){
+  const st='style="fill:none;stroke:currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
+  if(s==='gazebo') return `<svg viewBox="0 0 100 60" ${st}><path d="M10 26L50 6l40 20M18 26v30M82 26v30M50 6v4M14 26h72M30 56V36h40v20M6 56h88"/></svg>`;
+  if(s==='bench') return `<svg viewBox="0 0 100 60" ${st}><path d="M10 34h80M14 34v20M86 34v20M10 26h80v8H10zM30 34v20M70 34v20M4 56h92"/></svg>`;
+  if(s==='planter') return `<svg viewBox="0 0 100 60" ${st}><path d="M12 34h76l-6 22H18zM30 34c0-12 6-20 6-26M36 20c6-2 10 0 12 6M50 34c0-10 4-16 10-22M60 20c6 0 8 4 8 8M70 34c-2-8 2-12 6-14"/></svg>`;
+  return `<svg viewBox="0 0 100 60" ${st}><path d="M20 20h60v36H20zM20 20l30-14 30 14"/></svg>`;
+}
+function projCard(p){
+  return `<article class="proj"><div class="ba"><div class="b">Before · scrap</div><div class="a">${shapeSvg(p.shape)}After</div></div>
+    <div class="body"><h3>${esc(p.title)}</h3><p class="small muted">${esc(p.note)}</p>
+    <div class="row small"><span class="pill accent">${kg(p.kg)} reused</span><span class="muted">${esc(p.material)}</span></div>
+    <p class="small muted">${esc(p.location)} · ${esc(p.date)}</p></div></article>`;
+}
+
+/* ---------- resident: rewards ---------- */
+function vRewards(){
+  const bal = S.points.me;
+  return `<div class="page-head"><div><span class="eyebrow">Green Rewards</span><h1><span class="mono">${fmt(bal)}</span> points to spend</h1>
+    <p class="muted" style="margin-top:6px">Points follow the 3R hierarchy: giving an item a second life earns the most.</p></div></div>
+  <div class="rules">
+    <div class="rule reuse"><div class="p">+${PTS.reuse}</div><b>Reuse handover</b><p class="small muted">When a neighbour scans your QR at pickup.</p></div>
+    <div class="rule receive"><div class="p">+${PTS.receive}</div><b>Take instead of buy</b><p class="small muted">For the neighbour who picks up a reused item.</p></div>
+    <div class="rule recycle"><div class="p">+${PTS.recycle}</div><b>Recycled via SDP</b><p class="small muted">When SDP logs the item at collection.</p></div>
+  </div>
+  <section class="stack"><h2>Township rewards</h2>
+  <div class="rewards">${S.rewards.map(r=>`<div class="reward"><span class="eyebrow">${esc(r.partner)}</span><h3>${esc(r.name)}</h3><span class="cost">${fmt(r.cost)} pts</span>
+    <button class="btn sm ${bal>=r.cost?'primary':''}" data-act="redeem" data-v="${r.id}" ${bal>=r.cost?'':'disabled'}>${bal>=r.cost?'Redeem':`Need ${fmt(r.cost-bal)} more`}</button></div>`).join('')}</div></section>
+  ${S.redemptions.length?`<section class="card stack"><h2>Your vouchers</h2><div class="ledger">${S.redemptions.map(x=>`<div><span>${esc(x.name)}<br><span class="small muted">${esc(x.partner)}</span></span><span class="mono" style="font-weight:700;letter-spacing:.1em">${x.code}</span></div>`).join('')}</div><p class="small muted">Show the code at the counter.</p></section>`:''}`;
+}
+
+/* ---------- admin: ESG ---------- */
+function vESG(){
+  const e = esg(), bm = e.byMonth, cur = bm[5], prev = bm[4];
+  const d = (a,b)=>{ if(!b) return ''; const p=(a-b)/b*100; return `<span class="delta ${p<0?'neg':''}">${p>=0?'▲':'▼'} ${fmt(Math.abs(p),0)}% vs ${MON[(prev.mk)%12]}</span>`; };
+  // chart
+  const W=640,H=260,pl=48,pr=12,pt=14,pb=30, cw=(W-pl-pr)/bm.length;
+  const max = Math.max(...bm.map(m=>m.reuseKg+m.recycleKg)); const step = niceStep(max/4); const top = Math.ceil(max/step)*step;
+  const y = v => pt + (H-pt-pb)*(1-v/top);
+  let grid=''; for(let v=0; v<=top; v+=step) grid+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${pl-8}" y="${y(v)+4}" text-anchor="end" style="fill:var(--muted);font:11px var(--f-mono)">${fmt(v)}</text>`;
+  const bars = bm.map((m,i)=>{ const x=pl+i*cw+cw*0.22, bw=cw*0.56; const isCur=i===5;
+    return `<rect x="${x}" y="${y(m.reuseKg)}" width="${bw}" height="${y(0)-y(m.reuseKg)}" rx="3" style="fill:var(--reuse);opacity:${isCur?1:.85}"/>
+      <rect x="${x}" y="${y(m.reuseKg+m.recycleKg)}" width="${bw}" height="${y(m.reuseKg)-y(m.reuseKg+m.recycleKg)}" rx="3" style="fill:var(--recycle);opacity:${isCur?1:.85}"/>
+      <text x="${x+bw/2}" y="${y(m.reuseKg+m.recycleKg)-6}" text-anchor="middle" style="fill:var(--ink);font:600 11px var(--f-mono)">${fmt(m.reuseKg+m.recycleKg)}</text>
+      <text x="${x+bw/2}" y="${H-10}" text-anchor="middle" style="fill:${isCur?'var(--ink)':'var(--muted)'};font:${isCur?700:500} 11.5px var(--f-body)">${MON[m.mk%12]}${isCur?' (MTD)':''}</text>`; }).join('');
+  // category split from live + approximations of history (history has no category) -> use live listings incl. open/routed
+  const catTot = {}; S.listings.filter(l=>l.status!=='removed').forEach(l=>{ catTot[l.category]=(catTot[l.category]||0)+l.weightKg; });
+  S.weighins.forEach(w=>{ catTot[w.material]=(catTot[w.material]||0)+w.kg; });
+  const cats = Object.entries(catTot).sort((a,b)=>b[1]-a[1]).slice(0,7); const cmax = Math.max(1,...cats.map(c=>c[1]));
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · ESG Dashboard</span><h1>Elmina circularity report</h1>
+    <p class="muted" style="margin-top:6px">Since launch, all phases. Figures combine resident activity in WasteLoop with collection-point weigh-ins.</p></div><span class="sample-tag">includes sample history</span></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Diverted from landfill</span><span class="v">${fmt(e.total.kg/1000,2)}<small>tonnes</small></span>${d(cur.reuseKg+cur.recycleKg,prev.reuseKg+prev.recycleKg)}</div>
+    <div class="kpi"><span class="eyebrow">Items reused</span><span class="v">${fmt(e.total.items)}</span>${d(cur.items,prev.items)}</div>
+    <div class="kpi"><span class="eyebrow">Saved by residents</span><span class="v"><small style="margin:0 3px 0 0">RM</small>${fmt(e.total.valueRm)}</span>${d(cur.valueRm,prev.valueRm)}</div>
+    <div class="kpi"><span class="eyebrow">CO₂e avoided</span><span class="v">${fmt(e.total.co2/1000,1)}<small>tonnes</small></span>${d(cur.co2,prev.co2)}</div>
+  </div>
+  <div class="two">
+    <div class="card stack"><div class="row" style="justify-content:space-between"><h2>Kg diverted per month</h2>
+      <div class="legend"><span><i style="background:var(--reuse)"></i>Reused</span><span><i style="background:var(--recycle)"></i>Recycled</span></div></div>
+      <div class="chartbox"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Monthly kilograms diverted, reused and recycled">${grid}${bars}</svg></div>
+      <p class="small muted">Current month to date. Reuse share this month: <b>${fmt(cur.reuseKg/Math.max(1,cur.reuseKg+cur.recycleKg)*100,0)}%</b>.</p></div>
+    <div class="card stack"><h2>Log a weigh-in</h2><p class="small muted">For bulk drop-offs at a collection point. Scanning the bin QR fills the zone automatically in the full app.</p>
+      <form class="stack" data-form="weigh">
+        <label class="f">Collection point zone<select id="wz">${ZONES.map(z=>`<option>${z}</option>`).join('')}</select></label>
+        <label class="f">Material<select id="wm">${CATS.map(c=>`<option value="${c}">${CAT[c].label}</option>`).join('')}</select></label>
+        <label class="f">Weight (kg)<input type="number" id="wk" min="0.1" step="0.1" placeholder="e.g. 42.5"></label>
+        <button class="btn primary">Add to ESG record</button></form>
+      ${S.weighins.length?`<div class="ledger">${S.weighins.slice(0,4).map(w=>`<div><span>${esc(w.zone)} · ${esc(CAT[w.material]?.label||w.material)}</span><span class="mono">${fmt(w.kg,1)} kg</span></div>`).join('')}</div>`:''}
+    </div>
+  </div>
+  <div class="card stack"><h2>What residents are giving away</h2><p class="small muted">Weight of items currently listed or processed in the app, by category.</p>
+    ${cats.map(([c,v])=>`<div class="hbar"><span class="lbl">${esc(CAT[c]?.label||c)}</span><div class="track"><i style="width:${v/cmax*100}%;background:var(--accent)"></i></div><span class="num">${fmt(v,0)} kg</span></div>`).join('')}
+    <p class="small muted">CO₂e uses per-category estimates (for example furniture reuse 1.8 kg CO₂e per kg, e-waste reuse 20). Replace these with SDP's audited factors before reporting.</p></div>`;
+}
+function niceStep(x){ const p=Math.pow(10,Math.floor(Math.log10(x||1))); const n=x/p; return (n<=1?1:n<=2?2:n<=5?5:10)*p; }
+
+/* ---------- admin: heatmap ---------- */
+function vHeat(){
+  const ev = liveStats();
+  const counts = ZONES.map(z=>{ const row=[]; for(let w=7;w>=0;w--){ let c = w===0?0:(S.weekly.find(x=>x.zone===z&&x.week===w)?.count||0);
+      c += ev.filter(e=>e.zone===z && weekIdx(e.at)===w).length;
+      c += S.listings.filter(l=>l.zone===z && weekIdx(l.createdAt)===w && !l.sample).length;
+      if(w===0) c += S.listings.filter(l=>l.zone===z && l.sample && weekIdx(l.createdAt)===0).length; row.push(c);} return {z,row,total:row.reduce((a,b)=>a+b,0)}; });
+  const max = Math.max(1,...counts.flatMap(c=>c.row));
+  const cols = `minmax(110px,auto) repeat(8,minmax(0,1fr))`;
+  const head = `<span></span>${[7,6,5,4,3,2,1,0].map(w=>`<span class="wk">${w===0?'This wk':'−'+w+'w'}</span>`).join('')}`;
+  const cells = counts.map(c=>`<span class="lbl">${esc(c.z)}</span>${c.row.map(v=>{const p=v/max; return `<span class="c" style="background:color-mix(in oklab,var(--accent) ${Math.round(8+p*82)}%,var(--surface-2));color:${p>0.5?'var(--accent-ink)':'var(--ink)'}" title="${v} actions">${v}</span>`}).join('')}`).join('');
+  const rank = counts.slice().sort((a,b)=>b.total-a.total);
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Community Heatmap</span><h1>Where Elmina is most active</h1>
+    <p class="muted" style="margin-top:6px">Listings, handovers and recycling pickups per phase per week. Same data residents see on their impact page.</p></div><span class="sample-tag">includes sample history</span></div>
+  <div class="card"><div class="chartbox" style="overflow-x:auto"><div class="heat" style="grid-template-columns:${cols}">${head}${cells}</div></div>
+    <div class="row small muted" style="margin-top:10px">Fewer <span style="display:inline-flex;gap:3px">${[10,30,55,80].map(p=>`<i style="width:18px;height:12px;border-radius:3px;background:color-mix(in oklab,var(--accent) ${p}%,var(--surface-2))"></i>`).join('')}</span> More</div></div>
+  <div class="two">
+    <div class="card stack"><h2>Ranking, last 8 weeks</h2>${rank.map((c,i)=>`<div class="hbar"><span class="lbl">${i+1}. ${esc(c.z)}</span><div class="track"><i style="width:${c.total/rank[0].total*100}%;background:var(--accent)"></i></div><span class="num">${c.total}</span></div>`).join('')}</div>
+    <div class="card stack"><h2>Suggested action</h2><p>${esc(rank[rank.length-1].z)} has the lowest activity. Consider a collection-point roadshow or a bulky-item swap day there.</p>
+      <p class="small muted">${esc(rank[0].z)} leads with ${rank[0].total} actions. Its residents could seed a phase-vs-phase challenge.</p></div>
+  </div>`;
+}
+
+/* ---------- admin: collection ---------- */
+function vCollect(){
+  const q = S.listings.filter(l=>['routed','scheduled','recycled'].includes(l.status)).sort((a,b)=>({routed:0,scheduled:1,recycled:2}[a.status]-{routed:0,scheduled:1,recycled:2}[b.status])||(a.routedAt-b.routedAt));
+  const waiting = q.filter(l=>l.status==='routed'), sched = q.filter(l=>l.status==='scheduled');
+  const today = new Date(now()+DAY).toISOString().slice(0,10);
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Collection</span><h1>Recycling pickup queue</h1>
+    <p class="muted" style="margin-top:6px">Items residents sent to recycling, plus marketplace items nobody claimed within ${LIST_DAYS} days.</p></div></div>
+  <div class="kpis">
+    <div class="kpi"><span class="eyebrow">Awaiting schedule</span><span class="v">${waiting.length}</span></div>
+    <div class="kpi"><span class="eyebrow">Pickups scheduled</span><span class="v">${sched.length}</span></div>
+    <div class="kpi"><span class="eyebrow">Weight in queue</span><span class="v">${fmt([...waiting,...sched].reduce((a,b)=>a+b.weightKg,0),0)}<small>kg</small></span></div>
+    <div class="kpi"><span class="eyebrow">Collected (app)</span><span class="v">${q.filter(l=>l.status==='recycled').length}</span></div>
+  </div>
+  <div class="card tablewrap">${q.length?`<table class="t"><thead><tr><th>Item</th><th>Resident · zone</th><th>Why here</th><th class="n">Kg</th><th>Status</th><th>Action</th></tr></thead><tbody>
+    ${q.map(l=>`<tr><td><b>${esc(l.title)}</b><div class="small muted">${esc(CAT[l.category].label)}</div></td><td>${esc(user(l.ownerId).name)}<div class="small muted">${esc(l.zone)}</div></td>
+      <td><span class="pill ${l.route==='recycle'?'recycle':'warn'}">${l.route==='recycle'?'AI: recycle':'Unclaimed'}</span></td><td class="n">${fmt(l.weightKg,1)}</td>
+      <td>${l.status==='routed'?'<span class="pill neutral">Waiting</span>':l.status==='scheduled'?`<span class="pill recycle">${esc(l.pickupDate)}</span>`:'<span class="pill reuse">Collected</span>'}</td>
+      <td>${l.status==='routed'?`<form class="row" data-form="sched" data-v="${l.id}" style="flex-wrap:nowrap"><input type="date" id="d_${l.id}" value="${today}" style="width:150px"><button class="btn sm">Schedule</button></form>`
+        : l.status==='scheduled'?`<button class="btn sm primary" data-act="collected" data-v="${l.id}">Mark collected</button>`:`<span class="small muted">+${PTS.recycle} pts to resident</span>`}</td></tr>`).join('')}
+  </tbody></table>`:`<div class="empty">The queue is empty.</div>`}</div>
+  <p class="small muted">Tip: use “Skip ahead 1 day” in the prototype controls to watch unclaimed listings expire into this queue.</p>`;
+}
+
+/* ---------- admin: listings & points ---------- */
+function vManage(){
+  const L = S.listings.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  const issued = S.ledger.filter(x=>x.pts>0).reduce((a,b)=>a+b.pts,0), redeemed = -S.ledger.filter(x=>x.pts<0).reduce((a,b)=>a+b.pts,0);
+  const st = s => ({open:'<span class="pill reuse">Open</span>',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">Queue</span>',scheduled:'<span class="pill recycle">Scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[s]);
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Listings & points</span><h1>Marketplace oversight</h1></div></div>
+  <div class="card tablewrap"><table class="t"><thead><tr><th>Listing</th><th>Owner</th><th>Route</th><th>Status</th><th>Expires</th><th></th></tr></thead><tbody>
+    ${L.map(l=>`<tr><td><b>${esc(l.title)}</b><div class="small muted">${esc(CAT[l.category].label)} · ${l.mode==='swap'?'Swap':'Free'}</div></td><td>${esc(user(l.ownerId).name)}<div class="small muted">${esc(l.zone)}</div></td>
+      <td><span class="pill ${l.route}">${routeName(l.route)}</span></td><td>${st(l.status)}</td>
+      <td class="mono small">${l.status==='open'?new Date(l.expiresAt).toLocaleDateString('en-MY',{day:'numeric',month:'short'}):'—'}</td>
+      <td>${l.status==='open'?`<button class="btn sm ghost" data-act="remove" data-v="${l.id}">Remove</button>`:''}</td></tr>`).join('')}
+  </tbody></table></div>
+  <div class="two">
+    <div class="card tablewrap"><h2 style="margin-bottom:8px">Points by resident</h2><table class="t" style="min-width:360px"><thead><tr><th>Resident</th><th>Zone</th><th class="n">Balance</th></tr></thead><tbody>
+      ${S.users.slice().sort((a,b)=>(S.points[b.id]||0)-(S.points[a.id]||0)).map(u=>`<tr><td>${u.id==='me'?'You (demo resident)':esc(u.name)}</td><td class="small muted">${esc(u.zone)}</td><td class="n">${fmt(S.points[u.id]||0)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="card stack"><h2>Points economy</h2>
+      <div class="facts"><div><span class="eyebrow">In circulation</span><b>${fmt(Object.values(S.points).reduce((a,b)=>a+b,0))}</b></div><div><span class="eyebrow">Issued (logged)</span><b>${fmt(issued)}</b></div><div><span class="eyebrow">Redeemed</span><b>${fmt(redeemed)}</b></div></div>
+      <p class="small muted">Rates: reuse handover ${PTS.reuse}, receiver ${PTS.receive}, recycling ${PTS.recycle}. Watch for one resident repeatedly handing items to the same neighbour.</p></div>
+  </div>`;
+}
+function vShowAdmin(){
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Showcase</span><h1>Post a reuse project</h1>
+    <p class="muted" style="margin-top:6px">Residents see these on their Impact page.</p></div></div>
+  <div class="two">
+    <div class="show" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">${S.showcase.map(projCard).join('')}</div>
+    <form class="card stack" data-form="show" style="align-self:start"><h3>New project</h3>
+      <label class="f">Project name<input type="text" id="sp_t" placeholder="e.g. Bus-stop shelter"></label>
+      <label class="f">Construction material reused<input type="text" id="sp_m" placeholder="e.g. Steel hoarding panels"></label>
+      <label class="f">Weight reused (kg)<input type="number" id="sp_k" min="1"></label>
+      <label class="f">Location<input type="text" id="sp_l" placeholder="e.g. Elmina West entrance"></label>
+      <label class="f">Type<select id="sp_s"><option value="gazebo">Shelter / gazebo</option><option value="bench">Seating</option><option value="planter">Garden / planter</option><option value="other">Other</option></select></label>
+      <label class="f">Short note<textarea id="sp_n"></textarea></label>
+      <button class="btn primary">Publish to residents</button></form>
+  </div>`;
+}
+
+/* ---------- overlays ---------- */
+function sheet(html){ document.getElementById('overlay').innerHTML = `<div class="scrim" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; afterRender(); }
+function closeSheet(){ stopScanner(); document.getElementById('overlay').innerHTML=''; }
+function toast(t){ const h=document.getElementById('toastHost'); h.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>h.innerHTML='',2800); }
+function showNotifs(){
+  const who = S.role==='admin'?'admin':'me';
+  const list = S.notifs.filter(n=>n.userId===who).slice(0,20);
+  sheet(`<div class="sheet-head"><h2>Notifications</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    ${list.length?`<div>${list.map(n=>`<div class="notif ${n.read?'':'unread'}"><b style="font-weight:500">${esc(n.text)}</b><span class="small muted">${new Date(n.at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}</span></div>`).join('')}</div>`:'<p class="muted">Nothing yet.</p>'}`);
+  list.forEach(n=>n.read=true); save(); render();
+}
+function showQR(id){
+  const l = S.listings.find(x=>x.id===id); if(!l) return;
+  sheet(`<div class="sheet-head"><div><span class="eyebrow">Handover QR</span><h2>${esc(l.title)}</h2></div><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    <p class="muted small">${esc(user(l.claimerId).name)} is coming to collect. They scan this at pickup, and your ${PTS.reuse} reuse points land straight away.</p>
+    <div class="qr" data-qr="wasteloop:handover:${l.id}:${l.code}"></div><div class="code">${l.code}</div>
+    <button class="btn" data-act="sim-scan" data-v="${l.id}">Simulate neighbour's scan</button>
+    <p class="small muted" style="text-align:center">Prototype button. In the real app the neighbour's phone does this.</p>`);
+}
+function showScan(id){
+  const l = S.listings.find(x=>x.id===id); if(!l) return;
+  sheet(`<div class="sheet-head"><div><span class="eyebrow">Pickup</span><h2>Scan ${esc(user(l.ownerId).name)}'s QR</h2></div><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    <video class="cam" id="cam" playsinline muted></video>
+    <p class="small muted" id="camMsg">Starting camera… Point it at the QR on the owner's phone.</p>
+    <p class="small muted">No camera? Type the 6-character code under their QR. Demo code: <b class="mono">${l.code}</b></p>
+    <form class="row" data-form="code" data-v="${l.id}" style="flex-wrap:nowrap"><input type="text" id="codeIn" maxlength="6" placeholder="Code" style="text-transform:uppercase;font-family:var(--f-mono);letter-spacing:.15em"><button class="btn primary">Confirm</button></form>`);
+  startScanner(l);
+}
+let camStream=null, camRaf=0;
+function stopScanner(){ cancelAnimationFrame(camRaf); camStream?.getTracks().forEach(t=>t.stop()); camStream=null; }
+async function startScanner(l){
+  const vid=document.getElementById('cam'), msg=document.getElementById('camMsg');
+  if(!navigator.mediaDevices?.getUserMedia || !window.jsQR){ vid.hidden=true; msg.textContent='Camera scanning is not available here. Use the code instead.'; return; }
+  try{
+    camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    if(!document.getElementById('cam')){ stopScanner(); return; }
+    vid.srcObject=camStream; await vid.play(); msg.textContent='Point the camera at the QR code.';
+    const c=document.createElement('canvas'), ctx=c.getContext('2d',{willReadFrequently:true});
+    const tick=()=>{
+      if(!document.getElementById('cam')){ stopScanner(); return; }
+      if(vid.readyState>=2){ c.width=vid.videoWidth; c.height=vid.videoHeight; ctx.drawImage(vid,0,0);
+        const res = jsQR(ctx.getImageData(0,0,c.width,c.height).data,c.width,c.height,{inversionAttempts:'dontInvert'});
+        if(res?.data){ const p=res.data.split(':');
+          if(p[0]==='wasteloop' && p[2]===l.id && p[3]===l.code){ stopScanner(); confirmPickup(l); save(); closeSheet(); render(); toast(`Pickup confirmed. +${PTS.receive} points, and ${user(l.ownerId).name} got +${PTS.reuse}`); return; }
+          msg.textContent='That QR is for a different item.'; }
+      }
+      camRaf=requestAnimationFrame(tick);
+    };
+    tick();
+  }catch(e){ vid.hidden=true; msg.textContent='Camera permission was not given. Use the code instead.'; }
+}
+function confirmPickup(l){
+  l.status='reused'; l.doneAt=now();
+  award(l.ownerId,PTS.reuse,`Reuse handover: ${l.title}`);
+  award(l.claimerId,PTS.receive,`Received: ${l.title}`);
+  const co2 = co2For(l.category,'reuse',l.weightKg);
+  if(l.ownerId==='me'||l.claimerId==='me'){ S.mine.kg+=l.weightKg; S.mine.co2+=co2; if(l.ownerId==='me') S.mine.items++; }
+  if(l.ownerId==='me') notify('me',`${user(l.claimerId).name} scanned your QR. +${PTS.reuse} points for “${l.title}”.`);
+  else notify(l.ownerId,`You scanned the handover for “${l.title}”.`);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', async ev=>{
+  const t = ev.target.closest('[data-act]'); if(!t) return;
+  const a = t.dataset.act, v = t.dataset.v;
+  if(a==='close-bg'){ if(ev.target===t) closeSheet(); return; }
+  switch(a){
+    case 'role': S.role=v; save(); render(); window.scrollTo(0,0); break;
+    case 'go': if(S.role==='admin' && ADM_NAV.some(n=>n[0]===v)) S.adminView=v; else { S.role='resident'; S.view=v; } save(); render(); window.scrollTo(0,0); break;
+    case 'notifs': showNotifs(); break;
+    case 'close': closeSheet(); break;
+    case 'skip': S.dayOffset++; processClock(); save(); render(); toast(`Clock moved to day +${S.dayOffset}`); break;
+    case 'reset': if(t.dataset.confirm){ try{localStorage.removeItem(KEY)}catch(e){} S=seed(); resetSnap(); processClock(); save(); render(); toast('Demo data reset'); }
+      else { t.dataset.confirm='1'; t.textContent='Tap again to reset'; setTimeout(()=>{ if(t.isConnected){ delete t.dataset.confirm; t.textContent='Reset demo data'; } },3000); } break;
+    case 'ex': U.snap.desc=v; render(); break;
+    case 'dismiss-install': try{ localStorage.setItem('wl-install-dismissed','1'); }catch(e){} render(); break;
+    case 'analyze': U.snap.desc = document.getElementById('desc')?.value||U.snap.desc; analyze(); break;
+    case 'cancel-ai': U.ctl?.abort(); break;
+    case 'manual': { const sn=U.snap; sn.result={isItem:true,item:(sn.desc||'My item').slice(0,40),category:'other',description:sn.desc,condition:'fair',route:'reuse',confidence:0,reason:'Route chosen by you (AI unavailable).',material:'—',weightKg:3,valueRm:0,tip:''}; sn.route='reuse'; sn.title=sn.result.item; sn.descEdit=sn.desc; sn.stage='result'; render(); break; }
+    case 'new-snap': resetSnap(); render(); window.scrollTo(0,0); break;
+    case 'route': U.snap.route=v; keepEdits(); render(); break;
+    case 'mode': keepEdits(); U.snap.mode=v; render(); break;
+    case 'ask': askWhy(v); break;
+    case 'post': postListing(); break;
+    case 'to-recycle': sendRecycle(); break;
+    case 'done-dispose': resetSnap(); render(); toast('Thanks for disposing safely'); break;
+    case 'mtab': S.marketTab=v; save(); render(); break;
+    case 'cat': S.cat=v; render(); break;
+    case 'claim': { const l=S.listings.find(x=>x.id===v); if(!l||l.status!=='open') break; l.status='reserved'; l.claimerId='me';
+      notify(l.ownerId,`A neighbour claimed “${l.title}”.`); save(); render(); toast(`Reserved. Scan ${user(l.ownerId).name}'s QR at pickup.`); break; }
+    case 'scan': showScan(v); break;
+    case 'show-qr': showQR(v); break;
+    case 'sim-claim': { const l=S.listings.find(x=>x.id===v); if(!l) break; const nb=S.users.filter(u=>u.id!=='me')[Math.floor(Math.random()*5)];
+      l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`); save(); render(); showQR(l.id); break; }
+    case 'sim-scan': { const l=S.listings.find(x=>x.id===v); if(!l) break; confirmPickup(l); save(); closeSheet(); render(); toast(`Handover confirmed. +${PTS.reuse} points`); break; }
+    case 'unwish': S.wishlist=S.wishlist.filter(w=>w.id!==v); save(); render(); break;
+    case 'redeem': { const r=S.rewards.find(x=>x.id===v); if(!r||S.points.me<r.cost) break; award('me',-r.cost,`Redeemed: ${r.name}`);
+      S.redemptions.unshift({name:r.name,partner:r.partner,code:'EL-'+code6(),at:now()}); save(); render(); toast(`Redeemed ${r.name}`); break; }
+    case 'collected': { const l=S.listings.find(x=>x.id===v); if(!l) break; l.status='recycled'; l.doneAt=now(); award(l.ownerId,PTS.recycle,`Recycled: ${l.title}`);
+      if(l.ownerId==='me'){ S.mine.kg+=l.weightKg; S.mine.co2+=co2For(l.category,'recycle',l.weightKg); }
+      notify(l.ownerId,`SDP collected “${l.title}” for recycling. +${PTS.recycle} points.`); save(); render(); toast('Logged as collected'); break; }
+    case 'remove': { const l=S.listings.find(x=>x.id===v); if(!l) break; l.status='removed'; notify(l.ownerId,`SDP removed your listing “${l.title}” for review.`); save(); render(); toast('Listing removed'); break; }
+  }
+});
+document.addEventListener('change', async ev=>{
+  if(ev.target.id==='photo'){ const f=ev.target.files?.[0]; if(!f) return;
+    try{ const {blob,thumb}=await toBlobs(f); U.snap.blob=blob; U.snap.photo=thumb; U.snap.desc=document.getElementById('desc')?.value||U.snap.desc; if(U.snap.stage==='error') U.snap.stage='idle'; render(); }
+    catch(e){ toast('That file could not be opened as an image'); }
+  }
+});
+document.addEventListener('input', ev=>{
+  if(ev.target.id==='desc'){ U.snap.desc=ev.target.value; const b=document.getElementById('goBtn'); if(b) b.disabled=!(U.snap.photo||U.snap.desc.trim()); }
+});
+document.addEventListener('drop', ev=>{ const dz=ev.target.closest?.('#drop'); if(!dz) return; ev.preventDefault();
+  const f=ev.dataTransfer?.files?.[0]; if(f){ const inp=document.getElementById('photo'); const dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; inp.dispatchEvent(new Event('change',{bubbles:true})); } });
+document.addEventListener('submit', ev=>{
+  const f = ev.target.closest('[data-form]'); if(!f) return; ev.preventDefault();
+  const k = f.dataset.form;
+  if(k==='ask'){ const i=document.getElementById('chatq'); const q=i.value; i.value=''; askWhy(q); }
+  if(k==='wish'){ const i=document.getElementById('wishText'); const txt=i.value.trim(); if(!txt) return; S.wishlist.unshift({id:uid('w'),userId:'me',text:txt.slice(0,80),category:'other',at:now()});
+    const hit = S.listings.find(l=>l.status==='open'&&l.ownerId!=='me'&&txt.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>3).some(w=>(l.title+' '+l.description).toLowerCase().includes(w)));
+    if(hit) notify('me',`Good news: “${hit.title}” in ${hit.zone} already matches your wishlist.`);
+    save(); render(); toast(hit?'Added. There is already a match, check notifications':'Added to your wishlist'); }
+  if(k==='weigh'){ const kgv=Number(document.getElementById('wk').value); if(!(kgv>0)){ toast('Enter a weight above 0'); return; }
+    S.weighins.unshift({zone:document.getElementById('wz').value,material:document.getElementById('wm').value,kg:kgv,at:now()}); save(); render(); toast(`${fmt(kgv,1)} kg added to the ESG record`); }
+  if(k==='sched'){ const id=f.dataset.v, d=document.getElementById('d_'+id).value; const l=S.listings.find(x=>x.id===id); if(!l||!d) return;
+    l.status='scheduled'; l.pickupDate=d; notify(l.ownerId,`SDP will collect “${l.title}” on ${d}. Leave it at your bin area that morning.`); save(); render(); toast('Pickup scheduled'); }
+  if(k==='code'){ const l=S.listings.find(x=>x.id===f.dataset.v); const c=document.getElementById('codeIn').value.trim().toUpperCase();
+    if(!l) return; if(c!==l.code){ toast('That code does not match. Check the owner\'s screen.'); return; }
+    confirmPickup(l); save(); closeSheet(); render(); toast(`Pickup confirmed. +${PTS.receive} points, and ${user(l.ownerId).name} got +${PTS.reuse}`); }
+  if(k==='show'){ const g=id=>document.getElementById(id).value.trim(); if(!g('sp_t')||!(Number(g('sp_k'))>0)){ toast('Add a name and the weight reused'); return; }
+    S.showcase.unshift({id:uid('s'),title:g('sp_t'),material:g('sp_m')||'Construction surplus',kg:Number(g('sp_k')),location:g('sp_l')||'Elmina',date:new Date(now()).toISOString().slice(0,7),shape:g('sp_s'),note:g('sp_n')});
+    S.users.forEach(u=>notify(u.id,`New SDP Showcase project: ${g('sp_t')}.`)); save(); render(); toast('Published to residents'); }
+});
+function keepEdits(){ const sn=U.snap; const lt=document.getElementById('lt'), ld=document.getElementById('ld'), sf=document.getElementById('sf');
+  if(lt) sn.title=lt.value; if(ld) sn.descEdit=ld.value; if(sf) sn.swapFor=sf.value; }
+function postListing(){
+  keepEdits(); const sn=U.snap, r=sn.result; const t=now();
+  const l = {id:uid('l'),ownerId:'me',title:(sn.title||r.item).slice(0,70),category:r.category,description:sn.descEdit||r.description,condition:r.condition,route:'reuse',
+    weightKg:r.weightKg,valueRm:r.valueRm,mode:sn.mode,swapFor:sn.mode==='swap'?sn.swapFor:'',zone:user('me').zone,createdAt:t,expiresAt:t+LIST_DAYS*DAY,
+    status:'open',claimerId:null,code:code6(),warned:false,photo:sn.photo,sample:false};
+  S.listings.unshift(l); matchWishes(l); S.marketTab='mine'; S.view='market'; resetSnap(); save(); render(); window.scrollTo(0,0);
+  toast('Posted. Neighbours with a matching wishlist have been notified');
+}
+function sendRecycle(){
+  const sn=U.snap, r=sn.result, t=now();
+  S.listings.unshift({id:uid('l'),ownerId:'me',title:r.item,category:r.category,description:r.description,condition:r.condition,route:'recycle',weightKg:r.weightKg,valueRm:0,mode:'free',swapFor:'',
+    zone:user('me').zone,createdAt:t,expiresAt:t,status:'routed',routedAt:t,claimerId:null,code:code6(),warned:true,photo:sn.photo,sample:false});
+  notify('admin',`New recycling item from ${user('me').zone}: ${r.item}.`);
+  resetSnap(); save(); render(); toast(`Added to SDP collection. +${PTS.recycle} points on pickup`);
+}
+
+processClock(); save(); render();
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+</script>
+</body>
+</html>
