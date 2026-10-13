@@ -1,5 +1,8 @@
-// Lets the app know whether AI sorting is switched on.
+import { provider } from './_ai.js';
+
+// Lets the app know whether AI sorting is switched on, and which provider.
 export default function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
-  res.status(200).json({ ai: Boolean(process.env.ANTHROPIC_API_KEY) });
+  const p = provider();
+  res.status(200).json({ ai: Boolean(p), provider: p });
 }

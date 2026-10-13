@@ -547,7 +547,7 @@ async function analyze(){
   render();
 }
 function errCopy(code){
-  return ({not_configured:'The AI server has no API key yet. Add ANTHROPIC_API_KEY in your hosting settings (see README).',
+  return ({not_configured:'The AI server has no API key yet. Add a free GEMINI_API_KEY in your Vercel settings (see README).',
     not_granted:'AI sorting needs your permission to use Claude. Reload the page and allow it to try again.',
     sampling_disabled:'Claude is not available for this account, so AI sorting is off. Choose a route yourself below.',
     rate_limited:'Too many requests just now. Wait a minute and try again.',
