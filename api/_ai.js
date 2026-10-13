@@ -30,7 +30,7 @@ async function gemini({ messages, maxTokens, json }) {
   if (json) generationConfig.responseMimeType = 'application/json';
   const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
+    headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY.trim() },
     body: JSON.stringify({ contents, generationConfig }),
   });
   const j = await r.json().catch(() => ({}));
@@ -58,7 +58,7 @@ async function anthropic({ kind, messages, maxTokens }) {
   }));
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+    headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY.trim(), 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({ model, max_tokens: maxTokens, messages: msgs }),
   });
   const j = await r.json().catch(() => ({}));
