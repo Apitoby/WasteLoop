@@ -436,12 +436,16 @@ async function api(path, body, signal){
   if(!r.ok) throw {code:j?.code||(r.status===429?'rate_limited':'upstream_error'), message:j?.error||('HTTP '+r.status)};
   return j;
 }
-U.sample = { json:(prompt,opts={})=>api('api/analyze',{prompt,image:opts.imageData||null},opts.signal).then(j=>j.result) };
-(async()=>{
-  try{ const r = await fetch('api/health',{cache:'no-store'}); const j = await r.json(); if(!j.ai) U.sample=null; }
+const AI_CLIENT = { json:(prompt,opts={})=>api('api/analyze',{prompt,image:opts.imageData||null},opts.signal).then(j=>j.result) };
+U.sample = AI_CLIENT;
+async function checkAI(){
+  try{ const r = await fetch('api/health?t='+Date.now(),{cache:'no-store'}); const j = await r.json(); U.sample = j.ai ? AI_CLIENT : null; }
   catch(e){ U.sample = null; }
-  render();
-})();
+  return !!U.sample;
+}
+checkAI().then(render);
+window.addEventListener('online',()=>checkAI().then(render));
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && !U.sample) checkAI().then(render); });
 
 /* ---------- domain ---------- */
 const user = id => S.users.find(u=>u.id===id) || {name:'Neighbour',zone:'—'};
@@ -520,6 +524,7 @@ async function toBlobs(file){
 }
 async function analyze(){
   const sn = U.snap;
+  if(!U.sample) await checkAI();
   if(!U.sample){ sn.stage='error'; sn.err='The AI server is not connected yet (see the README to add your API key). You can choose a route yourself for now.'; render(); return; }
   sn.stage='analyzing'; sn.err=''; sn.chat=[]; render();
   U.ctl = new AbortController();
