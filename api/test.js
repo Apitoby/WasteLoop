@@ -1,11 +1,11 @@
-import { callAI, provider } from './_ai.js';
+import { callAI, provider, geminiModels } from './_ai.js';
 
 // Open /api/test in a browser to check the AI key end to end.
 // Sends one tiny text request and shows Google's (or Anthropic's) exact reply or error.
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const p = provider();
-  const model = p === 'gemini' ? (process.env.GEMINI_MODEL || 'gemini-flash-latest')
+  const model = p === 'gemini' ? geminiModels().join(', ')
     : p === 'anthropic' ? (process.env.WASTELOOP_MODEL || 'claude-sonnet-5-5') : null;
   const key = p === 'gemini' ? process.env.GEMINI_API_KEY : process.env.ANTHROPIC_API_KEY;
   const keyHint = key ? `${key.slice(0, 4)}… (${key.length} chars${/\s/.test(key) ? ', CONTAINS SPACES' : ''})` : 'none';

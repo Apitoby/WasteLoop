@@ -17,8 +17,34 @@ export async function callAI({ kind, messages, maxTokens = 800, json = false }) 
 }
 
 /* ---------- Google Gemini ---------- */
-async function gemini({ messages, maxTokens, json }) {
-  const model = process.env.GEMINI_MODEL || 'gemini-flash-latest';
+// Models to try in order. GEMINI_MODEL can be one name or a comma-separated list.
+export function geminiModels() {
+  const list = (process.env.GEMINI_MODEL || 'gemini-flash-latest,gemini-flash-lite-latest')
+    .split(',').map(s => s.trim()).filter(Boolean);
+  return [...new Set(list)];
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Busy / overloaded / temporary errors: worth retrying or switching model.
+const isBusy = e => [429, 500, 503, 504].includes(e.status) || /overload|high demand|unavailable|try again/i.test(e.message || '');
+
+async function gemini(args) {
+  const models = geminiModels();
+  let last;
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try { return await geminiOnce(model, args); }
+      catch (e) {
+        last = e;
+        if (!isBusy(e)) throw e;                 // a real error (bad key, bad request): stop now
+        if (attempt === 0) await sleep(1200);    // brief pause, then one retry on the same model
+      }
+    }
+  }
+  last.message = `All Gemini models are busy right now (${models.join(', ')}). ${last.message}`;
+  throw last;
+}
+
+async function geminiOnce(model, { messages, maxTokens, json }) {
   const contents = messages.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [
@@ -68,6 +94,7 @@ async function anthropic({ kind, messages, maxTokens }) {
 
 function apiError(status, message) {
   const e = new Error(message);
+  e.status = status;
   e.code = status === 429 ? 'rate_limited' : 'upstream_error';
   return e;
 }
