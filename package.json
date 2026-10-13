@@ -1,0 +1,8 @@
+{
+  "name": "wasteloop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WasteLoop: AI reuse/recycle sorting app for townships (installable PWA + serverless AI).",
+  "engines": { "node": ">=18" }
+}
