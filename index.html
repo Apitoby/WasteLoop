@@ -547,7 +547,7 @@ async function analyze(){
   }catch(e){
     if(e?.code==='cancelled'||e?.name==='AbortError'){ sn.stage='idle'; }
     else if(e instanceof TypeError){ sn.stage='error'; sn.err='No internet connection. AI sorting needs to be online; your listings and points still work offline.'; }
-    else { sn.stage='error'; sn.err = errCopy(e?.code); }
+    else { sn.stage='error'; sn.err = errCopy(e?.code) + (e?.message && !['not_granted','rate_limited'].includes(e?.code) ? ` (Details: ${String(e.message).slice(0,200)})` : ''); }
   }
   render();
 }
