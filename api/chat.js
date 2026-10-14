@@ -1,8 +1,10 @@
+import { requireUser } from './_auth.js';
 import { callAI, sendError } from './_ai.js';
 
 // POST { messages: [{role:'user'|'assistant', content:string}, ...] } -> { text }
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ code: 'bad_request', error: 'Use POST' });
+  if (!requireUser(req, res)) return; // only signed-in residents and staff can use the AI
   try {
     let { messages } = req.body || {};
     if (!Array.isArray(messages) || !messages.length) { const e = new Error('No messages'); e.code = 'bad_request'; throw e; }

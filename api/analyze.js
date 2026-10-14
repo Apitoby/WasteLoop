@@ -1,8 +1,10 @@
+import { requireUser } from './_auth.js';
 import { callAI, parseJson, sendError } from './_ai.js';
 
 // POST { prompt: string, image?: base64 JPEG } -> { result: {...sorting JSON} }
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ code: 'bad_request', error: 'Use POST' });
+  if (!requireUser(req, res)) return; // only signed-in residents and staff can use the AI
   try {
     const { prompt, image } = req.body || {};
     if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 8000) {

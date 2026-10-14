@@ -6,10 +6,10 @@
 <title>WasteLoop</title>
 <meta name="description" content="Snap unwanted items; AI sorts them into reuse, recycle or dispose for your township.">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0D6B4E">
+<meta name="theme-color" content="#121110">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="WasteLoop">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
@@ -19,185 +19,235 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-body{margin:0;-webkit-tap-highlight-color:transparent}
-img{max-width:100%}
-[hidden]{display:none!important}
-.install{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:.9rem}
-.install svg{width:20px;height:20px;flex:none;color:var(--accent)}
-.cam{width:100%;max-width:280px;aspect-ratio:1;object-fit:cover;border-radius:16px;align-self:center;background:#0b0f0d}
-/* Layout: app shell — header with role switch, left rail nav on desktop / bottom tab bar on phone, single content column */
+/* Layout: black brand bar with a yellow > orange > red stripe (the 3R order); left rail on desktop, bottom tabs on phone; one content column */
 :root{
-  --bg:#EFF2EB; --surface:#FFFFFF; --surface-2:#E4E9DF; --ink:#16201A; --muted:#58675D; --line:#D2D9CC;
-  --accent:#0D6B4E; --accent-ink:#FFFFFF; --accent-soft:#D5E9DF;
-  --reuse:#1E8A4A; --recycle:#D97A1E; --dispose:#667085; --warn:#A86A0C; --danger:#B42318;
-  --shadow:0 1px 2px rgba(22,32,26,.06),0 6px 20px rgba(22,32,26,.06);
+  --bg:#F6F5F2; --surface:#FFFFFF; --surface-2:#EFEDE8; --ink:#121110; --muted:#625D55; --line:#E2DED6;
+  --accent:#FFC21A; --accent-ink:#121110; --accent-soft:#FFF2C2; --accent-text:#8A5E00;
+  --orange:#EE6A12; --red:#D7261E;
+  --reuse:#F5B400; --reuse-ink:#7E5600; --recycle:#EE6A12; --recycle-ink:#A84800; --dispose:#D7261E; --dispose-ink:#B01F18;
+  --warn:#C55400; --danger:#C8231B;
+  --bar:#121110; --bar-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(18,17,16,.06),0 6px 20px rgba(18,17,16,.07);
   --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
   --f-body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0E1411; --surface:#161F1A; --surface-2:#1F2A24; --ink:#E5ECE6; --muted:#97A89D; --line:#2B3731;
-  --accent:#43C08F; --accent-ink:#04130C; --accent-soft:#16372A;
-  --reuse:#4FC47F; --recycle:#F0A04D; --dispose:#9AA3B2; --warn:#E3A93C; --danger:#F07468;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+  --bg:#0E0D0C; --surface:#181715; --surface-2:#23211E; --ink:#F6F4EF; --muted:#A8A299; --line:#302D29;
+  --accent:#FFC83A; --accent-ink:#121110; --accent-soft:#3A2D06; --accent-text:#FFD15C;
+  --orange:#FF8A3D; --red:#FF5A4E;
+  --reuse:#FFC83A; --reuse-ink:#FFD15C; --recycle:#FF8A3D; --recycle-ink:#FFA36B; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
+  --warn:#FF9A4D; --danger:#FF6A5E;
+  --bar:#000000; --bar-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0E1411; --surface:#161F1A; --surface-2:#1F2A24; --ink:#E5ECE6; --muted:#97A89D; --line:#2B3731;
-  --accent:#43C08F; --accent-ink:#04130C; --accent-soft:#16372A;
-  --reuse:#4FC47F; --recycle:#F0A04D; --dispose:#9AA3B2; --warn:#E3A93C; --danger:#F07468;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+  --bg:#0E0D0C; --surface:#181715; --surface-2:#23211E; --ink:#F6F4EF; --muted:#A8A299; --line:#302D29;
+  --accent:#FFC83A; --accent-ink:#121110; --accent-soft:#3A2D06; --accent-text:#FFD15C;
+  --orange:#FF8A3D; --red:#FF5A4E;
+  --reuse:#FFC83A; --reuse-ink:#FFD15C; --recycle:#FF8A3D; --recycle-ink:#FFA36B; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
+  --warn:#FF9A4D; --danger:#FF6A5E;
+  --bar:#000000; --bar-ink:#FFFFFF;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}
 
 *{box-sizing:border-box}
 html,body{min-height:100%}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+body{margin:0;-webkit-tap-highlight-color:transparent;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+img{max-width:100%}
+[hidden]{display:none!important}
 button,input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
-h1{font-size:clamp(1.6rem,3vw,2.1rem);font-weight:800;letter-spacing:-.02em}
-h2{font-size:1.25rem;font-weight:700;letter-spacing:-.01em}
-h3{font-size:1.02rem;font-weight:700}
+h1{font-size:clamp(1.35rem,2.5vw,1.75rem);font-weight:800;letter-spacing:-.02em}
+h2{font-size:1.1rem;font-weight:700;letter-spacing:-.01em}
+h3{font-size:1rem;font-weight:700}
 p{margin:0}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .muted{color:var(--muted)}
 .small{font-size:.86rem}
-.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
-:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+.eyebrow{font-size:.72rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+:focus-visible{outline:2.5px solid var(--orange);outline-offset:2px}
+body.out .top,body.out .shell,body.out .tabbar{display:none}
 
-/* header */
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in oklab,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top-in{display:flex;align-items:center;gap:12px;padding:10px 16px;max-width:1200px;margin:0 auto;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.2rem;letter-spacing:-.02em}
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);color:var(--bar-ink)}
+.top::after{content:"";display:block;height:3px;background:linear-gradient(90deg,var(--accent),var(--orange) 55%,var(--red))}
+.top-in{display:flex;align-items:center;gap:10px;padding:9px 16px;max-width:1200px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.15rem;letter-spacing:-.02em;min-width:0}
 .brand-mark{width:30px;height:30px;flex:none}
-.brand small{font-family:var(--f-body);font-weight:500;font-size:.75rem;color:var(--muted);letter-spacing:0}
+.brand small{font-family:var(--f-body);font-weight:500;font-size:.75rem;color:color-mix(in oklab,var(--bar-ink) 60%,transparent);letter-spacing:0}
 .spacer{flex:1}
-.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
-.seg button{border:0;background:transparent;padding:6px 13px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.86rem;color:var(--muted)}
-.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.iconbtn{position:relative;border:1px solid var(--line);background:var(--surface);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}
+.role-tag{background:var(--orange);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.iconbtn{position:relative;border:1px solid var(--line);background:var(--surface);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none;color:var(--ink)}
 .iconbtn svg{width:19px;height:19px}
-.dot{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--danger);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center}
-.pts-chip{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);font-weight:700;border-radius:999px;padding:6px 12px;font-size:.86rem;border:0;cursor:pointer}
+.top .iconbtn{background:transparent;border-color:color-mix(in oklab,var(--bar-ink) 25%,transparent);color:var(--bar-ink)}
+.dot{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:.68rem;font-weight:700;display:grid;place-items:center}
+.pts-chip{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-ink);font-weight:800;border-radius:999px;padding:6px 12px;font-size:.84rem;border:0;cursor:pointer;white-space:nowrap}
+.avatar{width:36px;height:36px;border-radius:50%;border:1.5px solid color-mix(in oklab,var(--bar-ink) 35%,transparent);background:transparent;color:var(--bar-ink);font-weight:800;font-size:.78rem;cursor:pointer;display:grid;place-items:center;flex:none}
+.avatar.lg{width:48px;height:48px;background:var(--accent);color:var(--accent-ink);border:0;font-size:1rem;cursor:default}
 
 /* shell */
-.shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:210px minmax(0,1fr);gap:28px;padding:20px 16px 40px}
-.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 76px);align-self:start;display:flex;flex-direction:column;gap:3px}
-.rail button{display:flex;align-items:center;gap:11px;border:0;background:transparent;padding:10px 12px;border-radius:11px;cursor:pointer;font-weight:600;color:var(--muted);text-align:left}
-.rail button svg{width:20px;height:20px;flex:none}
-.rail button[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
-.rail button[aria-current="page"] svg{color:var(--accent)}
-.rail-foot{margin-top:18px;padding:12px;border:1px dashed var(--line);border-radius:12px;display:flex;flex-direction:column;gap:8px}
-main{min-width:0;display:flex;flex-direction:column;gap:22px}
+.shell{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:28px;padding:20px 16px 40px}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px);align-self:start;display:flex;flex-direction:column;gap:3px}
+.rail button{display:flex;align-items:center;gap:11px;border:0;background:transparent;padding:9px 12px;border-radius:11px;cursor:pointer;font-weight:600;color:var(--muted);text-align:left}
+.ni{display:grid;place-items:center}
+.ni svg{width:20px;height:20px}
+.rail button:hover{color:var(--ink)}
+.rail button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+main{min-width:0;display:flex;flex-direction:column;gap:20px}
 .tabbar{display:none}
-
 @media (max-width:820px){
-  .shell{grid-template-columns:minmax(0,1fr);padding-bottom:110px}
+  .shell{grid-template-columns:minmax(0,1fr);padding-bottom:110px;padding-top:16px}
   .rail{display:none}
   .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
-  .tabbar button{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;font-weight:600;color:var(--muted);padding:6px 0;cursor:pointer;border-radius:10px}
-  .tabbar button svg{width:22px;height:22px}
-  .tabbar button[aria-current="page"]{color:var(--accent)}
+  .tabbar button{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:.7rem;font-weight:600;color:var(--muted);padding:4px 0;cursor:pointer;border-radius:10px}
+  .tabbar .ni{width:52px;height:30px;border-radius:999px}
+  .tabbar .ni svg{width:21px;height:21px}
+  .tabbar button[aria-current="page"]{color:var(--ink);font-weight:800}
+  .tabbar button[aria-current="page"] .ni{background:var(--accent);color:var(--accent-ink)}
   .brand small{display:none}
 }
 
 /* generic */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .stack{display:flex;flex-direction:column;gap:10px}
 .grid{display:grid;gap:14px}
-.btn{border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:9px 15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:.92rem}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:9px 15px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:.92rem;color:var(--ink)}
 .btn:hover{border-color:var(--muted)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.07)}
+.btn.primary:hover{filter:brightness(1.04);border-color:var(--accent)}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.danger-outline{background:transparent;border-color:var(--red);color:var(--dispose-ink)}
 .btn.ghost{background:transparent}
 .btn.sm{padding:6px 11px;font-size:.84rem;border-radius:9px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.big{padding:13px 18px;font-size:1rem;border-radius:13px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .btn svg{width:17px;height:17px}
+.linkbtn{border:0;background:none;color:var(--accent-text);font-weight:700;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;font-size:.88rem}
 label.f{display:flex;flex-direction:column;gap:5px;font-size:.84rem;font-weight:600;color:var(--muted)}
-input[type=text],input[type=number],input[type=date],select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;width:100%;color:var(--ink);font-weight:400;font-size:.95rem}
+input[type=text],input[type=password],input[type=number],input[type=date],select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;width:100%;color:var(--ink);font-weight:400;font-size:1rem}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);outline:none;box-shadow:0 0 0 3px color-mix(in oklab,var(--orange) 22%,transparent)}
 textarea{resize:vertical;min-height:70px}
 .pill{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.02em;white-space:nowrap}
-.pill.reuse{background:color-mix(in oklab,var(--reuse) 16%,transparent);color:var(--reuse)}
-.pill.recycle{background:color-mix(in oklab,var(--recycle) 18%,transparent);color:var(--recycle)}
-.pill.dispose{background:color-mix(in oklab,var(--dispose) 20%,transparent);color:var(--dispose)}
+.pill.reuse{background:color-mix(in oklab,var(--reuse) 24%,transparent);color:var(--reuse-ink)}
+.pill.recycle{background:color-mix(in oklab,var(--recycle) 18%,transparent);color:var(--recycle-ink)}
+.pill.dispose{background:color-mix(in oklab,var(--dispose) 16%,transparent);color:var(--dispose-ink)}
 .pill.neutral{background:var(--surface-2);color:var(--muted)}
-.pill.warn{background:color-mix(in oklab,var(--warn) 18%,transparent);color:var(--warn)}
-.pill.accent{background:var(--accent-soft);color:var(--accent)}
+.pill.warn{background:color-mix(in oklab,var(--orange) 18%,transparent);color:var(--recycle-ink)}
+.pill.accent{background:var(--accent-soft);color:var(--accent-text)}
 .sample-tag{font-size:.7rem;font-weight:600;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:2px 7px}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .page-head p{max-width:62ch}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .subtabs{display:flex;gap:6px;flex-wrap:wrap}
 .subtabs button{border:1px solid var(--line);background:var(--surface);padding:7px 13px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.86rem;color:var(--muted)}
 .subtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.empty{padding:28px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:var(--r)}
+.empty{padding:24px;text-align:center;color:var(--muted);border:1.5px dashed var(--line);border-radius:var(--r)}
+.err{color:var(--danger);font-weight:600;font-size:.9rem}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 13px;border-radius:999px;cursor:pointer;font-weight:700;font-size:.86rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 
-/* snap */
-.snap-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px}
-@media (max-width:900px){.snap-grid{grid-template-columns:minmax(0,1fr)}}
-.drop{position:relative;border:2px dashed color-mix(in oklab,var(--accent) 45%,var(--line));border-radius:18px;background:
-  repeating-linear-gradient(135deg,transparent 0 14px,color-mix(in oklab,var(--accent) 5%,transparent) 14px 28px),var(--surface);
-  min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;text-align:center;cursor:pointer;transition:border-color .15s,background-color .15s}
-.drop.over{border-color:var(--accent);background-color:var(--accent-soft)}
-.drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.lens{width:76px;height:76px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 0 0 8px var(--accent-soft)}
-.lens svg{width:34px;height:34px}
-.routes3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-@media (max-width:520px){.routes3{grid-template-columns:minmax(0,1fr)}}
-.route-key{border-radius:12px;padding:12px;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:4px}
-.route-key b{font-family:var(--f-display);font-size:1.02rem}
-.route-key.reuse b{color:var(--reuse)} .route-key.recycle b{color:var(--recycle)} .route-key.dispose b{color:var(--dispose)}
-.analyzing{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px;align-items:center}
-@media (max-width:560px){.analyzing{grid-template-columns:minmax(0,1fr)}}
-.photo{width:100%;max-width:100%;aspect-ratio:1;border-radius:14px;object-fit:cover;background:var(--surface-2);display:block}
-.scanwrap{position:relative;overflow:hidden;border-radius:14px}
-.scanwrap::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--accent);box-shadow:0 0 18px 4px var(--accent);top:0;animation:scan 1.8s ease-in-out infinite alternate}
+/* sign-in */
+.gate{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+.gate-hero{background:var(--bar);color:var(--bar-ink);padding:36px 16px 76px;position:relative}
+.gate-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--orange) 55%,var(--red))}
+.gate-hero .in{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.gate-hero .brand{font-size:1.4rem}
+.gate-hero .brand-mark{width:40px;height:40px}
+.gate-hero h1{font-size:clamp(1.6rem,6vw,2.1rem);color:var(--bar-ink)}
+.gate-hero h1 em{font-style:normal;color:var(--accent)}
+.gate-hero p{color:color-mix(in oklab,var(--bar-ink) 72%,transparent);max-width:38ch}
+.gate-card{width:calc(100% - 32px);max-width:440px;margin:-48px auto 32px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 20px;box-shadow:var(--shadow);position:relative;z-index:1;gap:12px}
+.demo{background:var(--surface-2);border-radius:10px;padding:9px 11px;color:var(--muted)}
+.demo b{color:var(--ink)}
+.gate-switch{display:flex;justify-content:center;padding-top:4px;border-top:1px solid var(--line)}
+
+/* home */
+.hello{display:flex;flex-direction:column;gap:3px}
+.install{display:flex;gap:10px;align-items:center;padding:11px 13px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:.9rem}
+.install svg{width:20px;height:20px;flex:none;color:var(--accent-text)}
+.snapcard{display:flex;flex-direction:column;gap:12px;padding:14px}
+.snap-row{display:flex;gap:12px;align-items:center}
+.snap-row > div{min-width:0}
+.snap-btn{position:relative;flex:none;width:56px;height:56px;border-radius:14px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;cursor:pointer;overflow:hidden}
+.snap-btn svg{width:26px;height:26px}
+.snap-btn img{width:100%;height:100%;object-fit:cover;display:block}
+.snap-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.snap-btn.over{outline:3px solid var(--orange);outline-offset:2px}
+.snap-form{display:flex;gap:8px}
+.snap-form input{flex:1;min-width:0}
+.snap-form .btn{flex:none}
+.legend3{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--muted);font-weight:600}
+.legend3 .d{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.d.reuse{background:var(--reuse)} .d.recycle{background:var(--recycle)} .d.dispose{background:var(--dispose)}
+.rowlist{display:flex;flex-direction:column}
+.irow{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer;width:100%;color:var(--ink)}
+.irow:last-child{border-bottom:0}
+.irow .th{width:48px;height:48px;border-radius:10px;background:var(--surface-2);overflow:hidden;display:grid;place-items:center}
+.irow .th img{width:100%;height:100%;object-fit:cover}
+.irow .th .glyph{width:26px;height:26px}
+.irow .tx{display:flex;flex-direction:column;min-width:0}
+.irow .tx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mini div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.mini b{font-family:var(--f-display);font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* snap flow */
+.analyzing{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:center}
+.photo{width:100%;max-width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;background:var(--surface-2);display:block}
+.scanwrap{position:relative;overflow:hidden;border-radius:12px}
+.scanwrap::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--accent);box-shadow:0 0 16px 4px var(--orange);top:0;animation:scan 1.8s ease-in-out infinite alternate}
 @keyframes scan{to{top:calc(100% - 3px)}}
 @media (prefers-reduced-motion:reduce){.scanwrap::after{animation:none;top:50%}}
-.verdict{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:20px}
-@media (max-width:620px){.verdict{grid-template-columns:minmax(0,1fr)}.verdict .photo{max-width:240px}}
-.stamp{display:inline-flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;padding:4px 14px 4px 6px;border-radius:12px;border:2.5px solid currentColor;transform:rotate(-1.5deg)}
-.stamp .ico{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:currentColor}
-.stamp .ico svg{width:20px;height:20px;color:var(--surface)}
-.stamp.reuse{color:var(--reuse)} .stamp.recycle{color:var(--recycle)} .stamp.dispose{color:var(--dispose)}
-.meter{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;width:120px}
-.meter i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.verdict{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:18px}
+@media (max-width:620px){.verdict{grid-template-columns:minmax(0,1fr)}.verdict .photo{max-width:160px}}
+.stamp{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.3rem;letter-spacing:-.02em;padding:3px 12px 3px 5px;border-radius:11px;border:2.5px solid currentColor;transform:rotate(-1.5deg)}
+.stamp .ico{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;background:currentColor}
+.stamp .ico svg{width:17px;height:17px;color:var(--surface)}
+.stamp.reuse{color:var(--reuse-ink)} .stamp.recycle{color:var(--recycle-ink)} .stamp.dispose{color:var(--dispose-ink)}
+.meter{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;width:110px}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--orange));border-radius:4px}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .facts div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.facts b{font-family:var(--f-mono);font-size:.98rem;font-variant-numeric:tabular-nums}
+.facts b{font-family:var(--f-mono);font-size:.96rem;font-variant-numeric:tabular-nums}
 .tip{display:flex;gap:10px;background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:.92rem}
-.tip svg{width:20px;height:20px;flex:none;color:var(--accent);margin-top:1px}
+.tip svg{width:20px;height:20px;flex:none;color:var(--orange);margin-top:1px}
 .chat{display:flex;flex-direction:column;gap:10px}
 .bubble{padding:10px 13px;border-radius:14px;max-width:85%;white-space:pre-wrap;font-size:.93rem}
 .bubble.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:4px}
 .bubble.ai{align-self:flex-start;background:var(--surface-2);border-bottom-left-radius:4px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.84rem;cursor:pointer;font-weight:500}
-.chip:hover{border-color:var(--accent);color:var(--accent)}
-.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 11px;font-size:.84rem;cursor:pointer;font-weight:500;color:var(--ink)}
+.chip:hover{border-color:var(--orange)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
 
 /* market */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
 .item .thumb{aspect-ratio:4/3;background:var(--surface-2);display:grid;place-items:center;position:relative;overflow:hidden}
 .item .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.item .thumb .glyph{width:64px;height:64px;color:color-mix(in oklab,var(--accent) 70%,var(--muted))}
+.item .thumb .glyph{width:60px;height:60px;color:color-mix(in oklab,var(--orange) 55%,var(--muted))}
+.glyph{color:color-mix(in oklab,var(--orange) 55%,var(--muted))}
 .item .thumb .badges{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;gap:6px}
 .item .thumb .pill{background:var(--surface);box-shadow:var(--shadow)}
 .item .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
 .item .meta{font-size:.82rem;color:var(--muted)}
 .item .foot{margin-top:auto;padding-top:8px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.clock{font-family:var(--f-mono);font-size:.78rem;font-weight:700}
-.clock.low{color:var(--warn)}
+.clock{font-family:var(--f-mono);font-size:.78rem;font-weight:700;color:var(--muted)}
+.clock.low{color:var(--dispose-ink)}
 .wish{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
-.wish .w-ico{width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.wish .w-ico{width:32px;height:32px;border-radius:9px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center;flex:none}
 .wish .w-ico svg{width:17px;height:17px}
 
 /* stats */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 @media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.kpi .v{font-family:var(--f-display);font-weight:800;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .v{font-family:var(--f-display);font-weight:800;font-size:clamp(1.4rem,3vw,1.9rem);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
 .kpi .v small{font-family:var(--f-body);font-size:.85rem;font-weight:600;color:var(--muted);margin-left:3px}
-.delta{font-size:.8rem;font-weight:700;color:var(--reuse)}
-.delta.neg{color:var(--danger)}
+.delta{font-size:.8rem;font-weight:700;color:var(--accent-text)}
+.delta.neg{color:var(--dispose-ink)}
 .two{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px}
 @media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
 .chartbox{overflow-x:auto}
@@ -208,66 +258,65 @@ textarea{resize:vertical;min-height:70px}
 .hbar .track{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden;display:flex}
 .hbar .track i{display:block;height:100%}
 .hbar .num{font-family:var(--f-mono);font-size:.82rem;font-variant-numeric:tabular-nums;min-width:60px;text-align:right}
-.hbar.me .lbl{font-weight:700;color:var(--accent)}
+.hbar.me .lbl{font-weight:800;color:var(--ink)}
+.hbar.me .lbl::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:6px;vertical-align:1px}
 .heat{display:grid;gap:4px;min-width:520px}
 .heat .c{aspect-ratio:1.7;border-radius:6px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.74rem;font-weight:700}
 .heat .lbl{font-size:.82rem;font-weight:600;display:flex;align-items:center;white-space:nowrap;padding-right:6px}
 .heat .wk{font-size:.72rem;color:var(--muted);text-align:center;font-family:var(--f-mono)}
-
 table.t{width:100%;border-collapse:collapse;font-size:.88rem;min-width:600px}
-.t th{text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line)}
+.t th{text-align:left;font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line)}
 .t td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
 .t td.n{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums}
 .t th.n{text-align:right}
 .tablewrap{overflow-x:auto}
-
 .ledger{display:flex;flex-direction:column}
 .ledger div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.9rem}
 .ledger div:last-child{border-bottom:0}
-.plus{color:var(--reuse);font-family:var(--f-mono);font-weight:700}
-.minus{color:var(--danger);font-family:var(--f-mono);font-weight:700}
-
+.plus{color:var(--accent-text);font-family:var(--f-mono);font-weight:700}
+.minus{color:var(--dispose-ink);font-family:var(--f-mono);font-weight:700}
 .rewards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
 .reward{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px}
-.reward .cost{font-family:var(--f-mono);font-weight:700;color:var(--accent)}
+.reward .cost{font-family:var(--f-mono);font-weight:700;color:var(--accent-text)}
 .rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:620px){.rules{grid-template-columns:minmax(0,1fr)}}
 .rule{border-radius:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--line)}
-.rule .p{font-family:var(--f-display);font-weight:800;font-size:1.5rem}
-.rule.reuse .p{color:var(--reuse)} .rule.recycle .p{color:var(--recycle)} .rule.receive .p{color:var(--accent)}
-
+.rule .p{font-family:var(--f-display);font-weight:800;font-size:1.4rem}
+.rule.reuse .p{color:var(--reuse-ink)} .rule.recycle .p{color:var(--recycle-ink)} .rule.receive .p{color:var(--accent-text)}
 .show{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
 .ba{display:grid;grid-template-columns:1fr 1fr;height:120px}
 .ba div{display:flex;align-items:flex-end;padding:8px 10px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;position:relative;overflow:hidden}
 .ba .b{background:repeating-linear-gradient(45deg,var(--surface-2) 0 8px,color-mix(in oklab,var(--muted) 18%,var(--surface-2)) 8px 16px);color:var(--muted)}
-.ba .a{background:color-mix(in oklab,var(--accent) 22%,var(--surface));color:var(--accent)}
+.ba .a{background:color-mix(in oklab,var(--accent) 30%,var(--surface));color:var(--accent-text)}
 .ba svg{position:absolute;inset:14px 14px 26px;width:calc(100% - 28px);height:calc(100% - 40px)}
 .proj .body{padding:14px;display:flex;flex-direction:column;gap:6px}
 
 /* overlays */
-.scrim{position:fixed;inset:0;background:rgba(10,16,12,.45);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.scrim{position:fixed;inset:0;background:rgba(10,9,8,.5);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.scrim.bottom{align-items:flex-end;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+@media (min-width:821px){.scrim.bottom{align-items:center}}
 .sheet{background:var(--surface);border-radius:18px;max-width:440px;width:100%;max-height:calc(100% - 32px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
 .sheet-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.confirm{gap:12px}
+.confirm .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.proto{background:var(--surface-2);border-radius:12px;padding:12px 14px}
 .qr{align-self:center;padding:12px;background:#fff;border-radius:12px;border:1px solid var(--line)}
 .qr img,.qr canvas{display:block;width:200px;height:200px}
 .code{font-family:var(--f-mono);font-size:1.5rem;font-weight:700;letter-spacing:.2em;text-align:center}
-.viewfinder{aspect-ratio:1;max-width:260px;width:100%;align-self:center;border-radius:16px;background:#0b0f0d;position:relative;overflow:hidden}
-.viewfinder::before{content:"";position:absolute;inset:18%;border:3px solid #43C08F;border-radius:12px}
-.viewfinder::after{content:"";position:absolute;left:18%;right:18%;height:2px;background:#43C08F;top:20%;box-shadow:0 0 12px #43C08F;animation:vf 1.6s ease-in-out infinite alternate}
-@keyframes vf{to{top:80%}}
-@media (prefers-reduced-motion:reduce){.viewfinder::after{animation:none;top:50%}}
+.cam{width:100%;max-width:280px;aspect-ratio:1;object-fit:cover;border-radius:16px;align-self:center;background:#0b0a09}
 .notif{display:flex;flex-direction:column;gap:2px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.9rem}
-.notif.unread b::before{content:"";display:inline-block;width:7px;height:7px;background:var(--accent);border-radius:50%;margin-right:7px;vertical-align:2px}
+.notif.unread b::before{content:"";display:inline-block;width:7px;height:7px;background:var(--orange);border-radius:50%;margin-right:7px;vertical-align:2px}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:.92rem}
 @media (min-width:821px){.toast{bottom:28px}}
-.banner{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:color-mix(in oklab,var(--warn) 14%,var(--surface));border:1px solid color-mix(in oklab,var(--warn) 40%,var(--line));font-size:.9rem}
-.banner svg{width:19px;height:19px;flex:none;color:var(--warn);margin-top:1px}
+.banner{display:flex;gap:10px;align-items:flex-start;padding:11px 13px;border-radius:12px;background:color-mix(in oklab,var(--orange) 12%,var(--surface));border:1px solid color-mix(in oklab,var(--orange) 40%,var(--line));font-size:.88rem}
+.banner svg{width:19px;height:19px;flex:none;color:var(--orange);margin-top:1px}
 .flowrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
 .flowrow span.s{background:var(--surface-2);padding:3px 9px;border-radius:999px;font-weight:600}
 </style>
 </head>
 <body>
+<div id="gate" hidden></div>
 <header class="top">
   <div class="top-in">
     <div class="brand">
@@ -275,12 +324,10 @@ table.t{width:100%;border-collapse:collapse;font-size:.88rem;min-width:600px}
       <span>WasteLoop <small>· Elmina township</small></span>
     </div>
     <div class="spacer"></div>
-    <div class="seg" role="group" aria-label="View as">
-      <button id="role-res" data-act="role" data-v="resident">Resident</button>
-      <button id="role-adm" data-act="role" data-v="admin">SDP Admin</button>
-    </div>
+    <span class="role-tag" id="roleTag" hidden>SDP Admin</span>
     <button class="pts-chip" id="ptsChip" data-act="go" data-v="rewards"></button>
     <button class="iconbtn" id="bell" data-act="notifs" aria-label="Notifications"></button>
+    <button class="avatar" id="meBtn" data-act="account" aria-label="Account and sign out"></button>
   </div>
 </header>
 
@@ -296,6 +343,7 @@ table.t{width:100%;border-collapse:collapse;font-size:.88rem;min-width:600px}
 (()=>{
 /* ---------- icons ---------- */
 const I = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>',
   camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></svg>',
   market:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM4 9c0 1.7 1.3 3 3 3s3-1.3 3-3m0 0c0 1.7 1.3 3 2 3s2-1.3 2-3m0 0c0 1.7 1.3 3 3 3s3-1.3 3-3M10 20v-5h4v5"/></svg>',
   leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19l8-8"/></svg>',
@@ -388,7 +436,7 @@ function seed(){
     for(let w=1;w<=7;w++) weekly.push({zone:z,week:w,count:Math.round((4+zi*2.2+r()*9)*(1+(7-w)*0.06))});
   });
   return {
-    v:1, dayOffset:0, role:'resident', view:'snap', adminView:'esg', marketTab:'feed', cat:'all',
+    v:1, dayOffset:0, view:'home', adminView:'esg', marketTab:'feed', cat:'all',
     users, listings, history, weekly, weighins:[],
     points:{me:140,u1:310,u2:260,u3:175,u4:220,u5:95},
     ledger:[
@@ -426,20 +474,41 @@ function load(){ try{ const j = JSON.parse(localStorage.getItem(KEY)); if(j && j
 function save(){ try{ const c = structuredClone(S); localStorage.setItem(KEY, JSON.stringify(c)); }catch(e){ try{ // drop photos if over quota
   const c = structuredClone(S); c.listings.forEach(l=>{ if(l.photo && l.status!=='open') l.photo=null; }); localStorage.setItem(KEY, JSON.stringify(c)); }catch(_){} } }
 S = load();
+if(S.view==='snap') S.view='home';
 
 /* ---------- transient UI state ---------- */
-const U = { snap:{stage:'idle', photo:null, blob:null, desc:'', result:null, err:'', chat:[], chatBusy:false, mode:'free', swapFor:'', route:null}, sample:undefined, imgOk:true, ctl:null };
-/* AI lives behind this app's own server functions (/api/*), so no Claude login is needed on the phone. */
+/* ---------- sign-in ---------- */
+const SKEY = 'wl-session';
+let SESSION = null;
+try{ SESSION = JSON.parse(localStorage.getItem(SKEY)); if(!SESSION?.token || SESSION.exp < Date.now()) SESSION = null; }catch(e){ SESSION = null; }
+function setSession(x){ SESSION = x; try{ x ? localStorage.setItem(SKEY, JSON.stringify(x)) : localStorage.removeItem(SKEY); }catch(e){} }
+const isAdmin = () => SESSION?.role === 'admin';
+function applySession(){
+  if(SESSION?.role!=='resident') return;
+  const me = S.users.find(u=>u.id==='me'); if(!me) return;
+  me.name = SESSION.name || 'Resident'; me.unit = SESSION.id;
+  if(SESSION.zone && ZONES.includes(SESSION.zone)) me.zone = SESSION.zone;
+}
+
+const U = { snap:{stage:'idle', photo:null, blob:null, desc:'', result:null, err:'', chat:[], chatBusy:false, mode:'free', swapFor:'', route:null},
+  sample:undefined, imgOk:true, ctl:null, demo:null, gate:{mode:'resident', err:'', busy:false, id:''} };
+/* AI and sign-in live behind this app's own server functions (/api/*). */
 async function api(path, body, signal){
-  const r = await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal});
+  const headers = {'Content-Type':'application/json'};
+  if(SESSION?.token) headers.Authorization = 'Bearer ' + SESSION.token;
+  const r = await fetch(path,{method:'POST',headers,body:JSON.stringify(body),signal});
   let j=null; try{ j=await r.json(); }catch(e){}
-  if(!r.ok) throw {code:j?.code||(r.status===429?'rate_limited':'upstream_error'), message:j?.error||('HTTP '+r.status)};
+  if(!r.ok){
+    const err = {code:j?.code||(r.status===429?'rate_limited':'upstream_error'), message:j?.error||('HTTP '+r.status)};
+    if(err.code==='unauthorized' && SESSION){ setSession(null); resetSnap(); U.gate={mode:'resident',err:'Your sign-in expired. Sign in again.',busy:false,id:''}; setTimeout(render,0); }
+    throw err;
+  }
   return j;
 }
 const AI_CLIENT = { json:(prompt,opts={})=>api('api/analyze',{prompt,image:opts.imageData||null},opts.signal).then(j=>j.result) };
 U.sample = AI_CLIENT;
 async function checkAI(){
-  try{ const r = await fetch('api/health?t='+Date.now(),{cache:'no-store'}); const j = await r.json(); U.sample = j.ai ? AI_CLIENT : null; }
+  try{ const r = await fetch('api/health?t='+Date.now(),{cache:'no-store'}); const j = await r.json(); U.sample = j.ai ? AI_CLIENT : null; U.demo = j.demo || null; }
   catch(e){ U.sample = null; }
   return !!U.sample;
 }
@@ -552,7 +621,8 @@ async function analyze(){
   render();
 }
 function errCopy(code){
-  return ({not_configured:'The AI server has no API key yet. Add a free GEMINI_API_KEY in your Vercel settings (see README).',
+  return ({unauthorized:'Your sign-in expired. Sign in again.',
+    not_configured:'The AI server has no API key yet. Add a free GEMINI_API_KEY in your Vercel settings (see README).',
     not_granted:'AI sorting needs your permission to use Claude. Reload the page and allow it to try again.',
     sampling_disabled:'Claude is not available for this account, so AI sorting is off. Choose a route yourself below.',
     rate_limited:'Too many requests just now. Wait a minute and try again.',
@@ -581,29 +651,95 @@ Answer the resident's questions briefly (2-4 sentences), practically, in plain E
 function resetSnap(){ U.snap={stage:'idle',photo:null,blob:null,desc:'',result:null,err:'',chat:[],chatBusy:false,mode:'free',swapFor:'',route:null}; }
 
 /* ---------- render: shell ---------- */
-const RES_NAV = [['snap','Snap',I.camera],['market','Market',I.market],['impact','Impact',I.leaf],['rewards','Rewards',I.gift]];
+const RES_NAV = [['home','Home',I.home],['market','Market',I.market],['impact','Impact',I.leaf],['rewards','Rewards',I.gift]];
 const ADM_NAV = [['esg','ESG',I.chart],['heat','Heatmap',I.grid],['collect','Collection',I.truck],['manage','Listings',I.list],['show','Showcase',I.hammer]];
+const initials = n => String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || '?';
+const MARK = '<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" style="fill:var(--accent)"/><path d="M10 17.5a6 6 0 0 1 10.4-4.1M22 14.5a6 6 0 0 1-10.4 4.1" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M20.6 9.6v3.9h-3.9M11.4 22.4v-3.9h3.9" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function render(){
-  const isAdm = S.role==='admin';
-  document.getElementById('role-res').setAttribute('aria-pressed',String(!isAdm));
-  document.getElementById('role-adm').setAttribute('aria-pressed',String(isAdm));
+  const gate = document.getElementById('gate');
+  document.body.classList.toggle('out', !SESSION);
+  if(!SESSION){ closeSheet(); gate.hidden=false; gate.innerHTML = vGate(); return; }
+  gate.hidden = true; if(gate.innerHTML) gate.innerHTML = '';
+  const isAdm = isAdmin();
+  document.getElementById('roleTag').hidden = !isAdm;
   const pc = document.getElementById('ptsChip'); pc.hidden = isAdm;
-  pc.innerHTML = `${I.leaf.replace('<svg','<svg width="15" height="15"')}<span class="mono">${fmt(S.points.me)}</span> pts`;
+  pc.innerHTML = `<span class="mono">${fmt(S.points.me)}</span> pts`;
+  document.getElementById('meBtn').textContent = initials(SESSION.name);
   const who = isAdm?'admin':'me';
   const unread = S.notifs.filter(n=>n.userId===who && !n.read).length;
   document.getElementById('bell').innerHTML = I.bell + (unread?`<span class="dot">${unread}</span>`:'');
   const nav = isAdm?ADM_NAV:RES_NAV, cur = isAdm?S.adminView:S.view;
-  const navHtml = nav.map(([k,l,ic])=>`<button data-act="go" data-v="${k}" ${k===cur?'aria-current="page"':''}>${ic}<span>${l}</span></button>`).join('');
-  document.getElementById('rail').innerHTML = navHtml + `<div class="rail-foot"><span class="eyebrow">Prototype controls</span>
-    <span class="small muted">Demo clock: <b class="mono">day +${S.dayOffset}</b></span>
-    <button class="btn sm" data-act="skip">Skip ahead 1 day</button>
-    <button class="btn sm ghost" data-act="reset">Reset demo data</button></div>`;
+  const navHtml = nav.map(([k,l,ic])=>`<button data-act="go" data-v="${k}" ${k===cur?'aria-current="page"':''}><span class="ni">${ic}</span><span>${l}</span></button>`).join('');
+  document.getElementById('rail').innerHTML = navHtml;
   document.getElementById('tabbar').innerHTML = navHtml;
-  const m = document.getElementById('main');
-  const views = isAdm ? {esg:vESG,heat:vHeat,collect:vCollect,manage:vManage,show:vShowAdmin} : {snap:vSnap,market:vMarket,impact:vImpact,rewards:vRewards};
-  m.innerHTML = (views[cur]||Object.values(views)[0])();
+  const views = isAdm ? {esg:vESG,heat:vHeat,collect:vCollect,manage:vManage,show:vShowAdmin} : {home:vHome,market:vMarket,impact:vImpact,rewards:vRewards};
+  document.getElementById('main').innerHTML = (views[cur]||Object.values(views)[0])();
   afterRender();
 }
+
+/* ---------- sign-in screen ---------- */
+function vGate(){
+  const g = U.gate, adm = g.mode==='admin';
+  const demo = adm ? U.demo?.admin : U.demo?.resident;
+  return `<div class="gate">
+  <div class="gate-hero"><div class="in">
+    <div class="brand">${MARK}<span>WasteLoop</span></div>
+    <h1>${adm?'Township <em>staff</em> console':'Give your things a <em>second life</em>'}</h1>
+    <p>${adm?'Monitor listings, schedule recycling pickups and report ESG impact for Elmina.':'Snap what you no longer need. A neighbour reuses it, or SDP recycles it. Not landfill.'}</p>
+  </div></div>
+  <form class="gate-card stack" data-form="login">
+    <span class="eyebrow">${adm?'SDP staff only':'Elmina residents only'}</span>
+    <h2>${adm?'Staff sign in':'Resident sign in'}</h2>
+    <p class="small muted">${adm?'Use your SDP staff ID and password.':'Use your unit number and the resident PIN from your township management office.'}</p>
+    <label class="f">${adm?'Staff ID':'Unit number'}<input type="text" id="lg_id" value="${esc(g.id)}" autocomplete="username" autocapitalize="characters" spellcheck="false" placeholder="${adm?'e.g. SDP-ADMIN':'e.g. EG2-08-12'}"></label>
+    <label class="f">${adm?'Password':'Resident PIN'}<input type="password" id="lg_pw" autocomplete="current-password" ${adm?'':'inputmode="numeric"'}></label>
+    ${g.err?`<p class="err" role="alert">${esc(g.err)}</p>`:''}
+    <button class="btn primary big" ${g.busy?'disabled':''}>${g.busy?'Signing in…':'Sign in'}</button>
+    ${demo?`<p class="small demo">Demo account: <b class="mono">${esc(demo)}</b></p>`:''}
+    <div class="gate-switch"><button type="button" class="linkbtn" data-act="gate-mode" data-v="${adm?'resident':'admin'}">${adm?'Back to resident sign in':'SDP staff? Sign in here'}</button></div>
+  </form></div>`;
+}
+async function doLogin(){
+  const g = U.gate;
+  const id = (document.getElementById('lg_id')?.value||'').trim(), pw = document.getElementById('lg_pw')?.value||'';
+  g.id = id;
+  if(!id || !pw){ g.err='Fill in both fields.'; render(); return; }
+  g.busy=true; g.err=''; render();
+  try{
+    const j = await api('api/login',{role:g.mode,id,secret:pw});
+    setSession({token:j.token, exp:j.exp, ...j.user});
+    if(j.user.role==='resident') S.view='home';
+    applySession(); save();
+    U.gate = {mode:'resident',err:'',busy:false,id:''};
+    render(); window.scrollTo(0,0); toast(`Signed in as ${j.user.name}`);
+  }catch(e){
+    g.busy=false;
+    g.err = e instanceof TypeError ? 'No internet connection. Signing in needs to be online.' : (e?.message || 'Sign-in failed. Try again.');
+    render();
+  }
+}
+function showAccount(){
+  if(!SESSION) return;
+  const adm = isAdmin(), me = user('me');
+  sheet(`<div class="sheet-head"><div class="row" style="flex-wrap:nowrap"><span class="avatar lg">${esc(initials(SESSION.name))}</span>
+      <div><h2>${esc(SESSION.name)}</h2><p class="small muted">${adm?'SDP staff · '+esc(SESSION.id):'Unit '+esc(SESSION.id)+' · '+esc(me.zone)}</p></div></div>
+      <button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    <div class="proto stack"><span class="eyebrow">Prototype controls</span>
+      <p class="small muted">Demo clock: <b class="mono">day +${S.dayOffset}</b>. Skip ahead to watch unclaimed listings expire into recycling.</p>
+      <div class="row"><button class="btn sm" data-act="skip">Skip ahead 1 day</button><button class="btn sm ghost" data-act="reset">Reset demo data</button></div></div>
+    <button class="btn big danger-outline" data-act="logout">Sign out</button>`);
+}
+
+/* ---------- confirmation sheet ---------- */
+let pendingConfirm = null;
+function confirmSheet({title, body='', ok='Confirm', tone='primary'}, fn){
+  pendingConfirm = fn;
+  sheet(`<div class="confirm stack"><h2>${esc(title)}</h2>${body?`<p class="muted">${esc(body)}</p>`:''}
+    <div class="actions"><button class="btn big" data-act="close">Cancel</button><button class="btn big ${tone}" data-act="confirm-yes" id="confirmYes" disabled>${esc(ok)}</button></div></div>`, 'bottom');
+  // short delay so the same swipe or tap that opened the sheet can't also hit Confirm
+  setTimeout(()=>{ const b=document.getElementById('confirmYes'); if(b) b.disabled=false; }, 400);
+}
+
 function afterRender(){
   document.querySelectorAll('[data-qr]').forEach(el=>{
     if(el.dataset.done) return; el.dataset.done='1';
@@ -617,50 +753,56 @@ function afterRender(){
 }
 
 /* ---------- resident: snap ---------- */
-function vSnap(){
+function vHome(){
   const sn = U.snap;
+  if(sn.stage==='analyzing') return vAnalyzing();
+  if(sn.stage==='result') return vResult();
+  const me = user('me');
   const standalone = window.navigator.standalone===true || matchMedia('(display-mode: standalone)').matches;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   let hideInstall=false; try{ hideInstall = localStorage.getItem('wl-install-dismissed')==='1'; }catch(e){}
   const install = (!standalone && isIOS && !hideInstall) ? `<div class="install">${I.spark}<div style="flex:1">Install WasteLoop: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.</div><button class="btn sm ghost" data-act="dismiss-install">OK</button></div>` : '';
-  const aiNote = install + (U.sample===null ? `<div class="banner">${I.info}<div>AI sorting is offline right now (no connection, or the server's API key isn't set). You can still choose a route yourself after adding a photo or description.</div></div>` : '');
-  if(sn.stage==='analyzing') return `
-    <div class="page-head"><div><span class="eyebrow">AI Smart Snap</span><h1>Sorting your item…</h1></div>
-    <button class="btn" data-act="cancel-ai">Stop</button></div>
-    <div class="card analyzing">
-      ${sn.photo?`<div class="scanwrap"><img class="photo" src="${sn.photo}" alt="Your photo"></div>`:`<div class="scanwrap"><div class="photo" style="display:grid;place-items:center">${glyph('other')}</div></div>`}
-      <div class="stack"><h2>Checking reuse first</h2>
-        <p class="muted">The AI identifies the item, judges its condition and picks the best route in the 3R order: reuse, then recycle, then dispose. This usually takes 5 to 30 seconds.</p>
-        <div class="flowrow"><span class="s">Identify</span>→<span class="s">Condition</span>→<span class="s">Route</span>→<span class="s">Listing draft</span></div></div>
-    </div>`;
-  if(sn.stage==='result') return vResult();
+  const near = S.listings.filter(l=>l.ownerId!=='me' && l.status==='open').sort((a,b)=>a.expiresAt-b.expiresAt).slice(0,3);
+  const h = new Date().getHours(), greet = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  const ready = sn.photo || sn.desc.trim();
   return `
-  <div class="page-head"><div><span class="eyebrow">AI Smart Snap</span><h1>Got something you don't need?</h1>
-    <p class="muted" style="margin-top:6px">Snap it. The AI tells you whether a neighbour can reuse it, it should be recycled, or it has to go to disposal, and drafts the listing for you.</p></div></div>
-  ${aiNote}
-  ${sn.stage==='error'?`<div class="banner">${I.info}<div>${esc(sn.err)}${U.sample===null&&(sn.photo||sn.desc)?` <button class="btn sm" data-act="manual" style="margin-left:6px">Choose route myself</button>`:''}</div></div>`:''}
-  <div class="snap-grid">
-    <label class="drop" id="drop">
-      ${sn.photo?`<img class="photo" src="${sn.photo}" alt="Selected photo" style="max-width:240px">`:`<div class="lens">${I.camera}</div>`}
-      <h2>${sn.photo?'Photo ready':'Snap or upload a photo'}</h2>
-      <p class="muted small">${sn.photo?'Tap to choose a different photo':'On your phone this opens the camera. On a computer, choose a file or drop it here.'}</p>
-      <input type="file" id="photo" accept="image/*" capture="environment" aria-label="Photo of item">
-    </label>
-    <div class="card stack">
-      <h3>Add a few words <span class="muted small" style="font-weight:500">(optional, or instead of a photo)</span></h3>
-      <textarea id="desc" placeholder="e.g. 3-seater fabric sofa, 6 years old, one cushion has a stain">${esc(sn.desc)}</textarea>
-      <div class="chips">${['IKEA-style bookshelf, one shelf warped','Box of old phone chargers and cables','Used AA batteries, about 20','Baby clothes 0–6 months, washed'].map(x=>`<button class="chip" data-act="ex" data-v="${esc(x)}">${esc(x)}</button>`).join('')}</div>
-      <button class="btn primary" data-act="analyze" ${sn.photo||sn.desc.trim()?'':'disabled'} id="goBtn">${I.spark} Sort it with AI</button>
+  <div class="hello"><span class="eyebrow">${esc(me.zone)}${me.unit?' · Unit '+esc(me.unit):''}</span><h1>${greet}, ${esc(me.name)}</h1></div>
+  ${install}
+  <section class="card snapcard" aria-label="AI Smart Snap">
+    <div class="snap-row">
+      <label class="snap-btn" id="drop" title="Snap or upload a photo">${sn.photo?`<img src="${sn.photo}" alt="Selected photo">`:I.camera}
+        <input type="file" id="photo" accept="image/*" capture="environment" aria-label="Snap or upload a photo of the item"></label>
+      <div><h3>${sn.photo?'Photo ready':'Sort an item with AI'}</h3>
+        <p class="small muted">${sn.photo?'Add a few words if you like, then tap Sort.':'Snap it, or describe it below. AI picks reuse, recycle or dispose.'}</p></div>
     </div>
-  </div>
+    <form class="snap-form" data-form="snap"><input type="text" id="desc" value="${esc(sn.desc)}" placeholder="Or describe it, e.g. sofa with one stain" aria-label="Describe the item"><button class="btn primary" id="goBtn" ${ready?'':'disabled'}>${I.spark}<span>Sort</span></button></form>
+    ${sn.stage==='error'?`<div class="banner">${I.info}<div>${esc(sn.err)}${ready?` <button type="button" class="linkbtn" data-act="manual">Choose route myself</button>`:''}</div></div>`:''}
+    ${U.sample===null&&sn.stage!=='error'?`<p class="small muted">AI sorting is offline right now. You can still choose a route yourself.</p>`:''}
+    <div class="legend3"><span><i class="d reuse"></i>Reuse +${PTS.reuse}</span><span><i class="d recycle"></i>Recycle +${PTS.recycle}</span><span><i class="d dispose"></i>Dispose 0</span></div>
+  </section>
   <section class="stack">
-    <span class="eyebrow">Where items go</span>
-    <div class="routes3">
-      <div class="route-key reuse"><b>Reuse · +${PTS.reuse} pts</b><span class="small muted">Listed free or as a swap for neighbours. Points land when they scan your handover QR.</span></div>
-      <div class="route-key recycle"><b>Recycle · +${PTS.recycle} pts</b><span class="small muted">SDP collects it. Unclaimed listings auto-route here after ${LIST_DAYS} days, with a reminder 2 days before.</span></div>
-      <div class="route-key dispose"><b>Dispose · 0 pts</b><span class="small muted">Only for contaminated or hazardous items. You get safe disposal steps.</span></div>
-    </div>
+    <div class="sec-head"><h2>Free near you</h2><button class="linkbtn" data-act="go" data-v="market">See all</button></div>
+    ${near.length?`<div class="card rowlist" style="padding:2px 14px">${near.map(irow).join('')}</div>`:`<div class="empty">Nothing listed right now. Check back later.</div>`}
+  </section>
+  <section class="stack">
+    <div class="sec-head"><h2>Your impact</h2><button class="linkbtn" data-act="go" data-v="impact">Details</button></div>
+    <div class="mini"><div><span class="eyebrow">Diverted</span><b>${fmt(S.mine.kg,0)} kg</b></div><div><span class="eyebrow">Reused</span><b>${fmt(S.mine.items)}</b></div><div><span class="eyebrow">Points</span><b>${fmt(S.points.me)}</b></div></div>
   </section>`;
+}
+function irow(l){
+  const d = (l.expiresAt-now())/DAY;
+  return `<button class="irow" data-act="go" data-v="market"><span class="th">${l.photo?`<img src="${l.photo}" alt="">`:glyph(l.category)}</span>
+    <span class="tx"><b>${esc(l.title)}</b><span class="small muted">${l.mode==='swap'?'Swap':'Free'} · ${esc(l.zone)}</span></span>
+    <span class="clock ${d<=WARN_DAYS?'low':''}">${d>=1?Math.floor(d)+'d left':Math.max(0,Math.floor(d*24))+'h left'}</span></button>`;
+}
+function vAnalyzing(){
+  const sn = U.snap;
+  return `<div class="card analyzing">
+    <div class="scanwrap">${sn.photo?`<img class="photo" src="${sn.photo}" alt="Your photo">`:`<div class="photo" style="display:grid;place-items:center">${glyph('other')}</div>`}</div>
+    <div class="stack" style="gap:6px"><span class="eyebrow">AI Smart Snap</span><h2>Sorting your item…</h2>
+      <p class="small muted">Checking reuse first, then recycle, then dispose. Usually 5 to 30 seconds.</p>
+      <div><button class="btn sm" data-act="cancel-ai">Stop</button></div></div>
+  </div>`;
 }
 function vResult(){
   const sn = U.snap, r = sn.result, route = sn.route;
@@ -689,7 +831,7 @@ function vResult(){
       <button class="btn" data-act="done-dispose">Done</button></div>`;
   return `
   <div class="page-head"><div><span class="eyebrow">AI Smart Snap · result</span><h1>${esc(r.item)}</h1></div>
-    <button class="btn" data-act="new-snap">${I.camera} Snap another</button></div>
+    <button class="btn" data-act="new-snap">Back to home</button></div>
   ${!r.isItem?`<div class="banner">${I.info}<div>The AI isn't sure this photo shows a household item. Check the details below or try another photo.</div></div>`:''}
   <div class="card verdict">
     ${sn.photo?`<img class="photo" src="${sn.photo}" alt="${esc(r.item)}">`:`<div class="photo" style="display:grid;place-items:center;color:var(--muted)">${glyph(r.category)}</div>`}
@@ -756,7 +898,7 @@ function vMarket(){
       ${feed.length?`<div class="cards">${feed.map(itemCard).join('')}</div>`:`<div class="empty">Nothing in this category right now. Add it to your wishlist and the AI will tell you when a neighbour posts one.</div>`}`;
   } else if(tab==='mine'){
     const mine = S.listings.filter(l=>l.ownerId==='me').sort((a,b)=>b.createdAt-a.createdAt);
-    body = mine.length?`<div class="cards">${mine.map(itemCard).join('')}</div>`:`<div class="empty">You haven't posted anything yet. <button class="btn sm" data-act="go" data-v="snap">Snap an item</button></div>`;
+    body = mine.length?`<div class="cards">${mine.map(itemCard).join('')}</div>`:`<div class="empty">You haven't posted anything yet. <button class="btn sm" data-act="go" data-v="home">Snap an item</button></div>`;
   } else {
     const ws = S.wishlist.filter(w=>w.userId==='me');
     body = `<div class="card stack"><h3>Looking for something?</h3><p class="small muted">Post it here before buying new. When a neighbour lists a match, you get a notification. This is the Reduce part of the 3Rs.</p>
@@ -872,6 +1014,8 @@ function vESG(){
 function niceStep(x){ const p=Math.pow(10,Math.floor(Math.log10(x||1))); const n=x/p; return (n<=1?1:n<=2?2:n<=5?5:10)*p; }
 
 /* ---------- admin: heatmap ---------- */
+// yellow (quiet) to orange to red (busiest)
+const heatStyle = p => `background:color-mix(in oklab,color-mix(in oklab,var(--red) ${Math.round(p*100)}%,var(--accent)) ${Math.round(14+p*86)}%,var(--surface-2));color:${p>0.7?'#fff':'var(--ink)'}`;
 function vHeat(){
   const ev = liveStats();
   const counts = ZONES.map(z=>{ const row=[]; for(let w=7;w>=0;w--){ let c = w===0?0:(S.weekly.find(x=>x.zone===z&&x.week===w)?.count||0);
@@ -881,12 +1025,12 @@ function vHeat(){
   const max = Math.max(1,...counts.flatMap(c=>c.row));
   const cols = `minmax(110px,auto) repeat(8,minmax(0,1fr))`;
   const head = `<span></span>${[7,6,5,4,3,2,1,0].map(w=>`<span class="wk">${w===0?'This wk':'−'+w+'w'}</span>`).join('')}`;
-  const cells = counts.map(c=>`<span class="lbl">${esc(c.z)}</span>${c.row.map(v=>{const p=v/max; return `<span class="c" style="background:color-mix(in oklab,var(--accent) ${Math.round(8+p*82)}%,var(--surface-2));color:${p>0.5?'var(--accent-ink)':'var(--ink)'}" title="${v} actions">${v}</span>`}).join('')}`).join('');
+  const cells = counts.map(c=>`<span class="lbl">${esc(c.z)}</span>${c.row.map(v=>{const p=v/max; return `<span class="c" style="${heatStyle(p)}" title="${v} actions">${v}</span>`}).join('')}`).join('');
   const rank = counts.slice().sort((a,b)=>b.total-a.total);
   return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Community Heatmap</span><h1>Where Elmina is most active</h1>
     <p class="muted" style="margin-top:6px">Listings, handovers and recycling pickups per phase per week. Same data residents see on their impact page.</p></div><span class="sample-tag">includes sample history</span></div>
   <div class="card"><div class="chartbox" style="overflow-x:auto"><div class="heat" style="grid-template-columns:${cols}">${head}${cells}</div></div>
-    <div class="row small muted" style="margin-top:10px">Fewer <span style="display:inline-flex;gap:3px">${[10,30,55,80].map(p=>`<i style="width:18px;height:12px;border-radius:3px;background:color-mix(in oklab,var(--accent) ${p}%,var(--surface-2))"></i>`).join('')}</span> More</div></div>
+    <div class="row small muted" style="margin-top:10px">Fewer <span style="display:inline-flex;gap:3px">${[0.1,0.4,0.7,1].map(p=>`<i style="width:18px;height:12px;border-radius:3px;${heatStyle(p)}"></i>`).join('')}</span> More</div></div>
   <div class="two">
     <div class="card stack"><h2>Ranking, last 8 weeks</h2>${rank.map((c,i)=>`<div class="hbar"><span class="lbl">${i+1}. ${esc(c.z)}</span><div class="track"><i style="width:${c.total/rank[0].total*100}%;background:var(--accent)"></i></div><span class="num">${c.total}</span></div>`).join('')}</div>
     <div class="card stack"><h2>Suggested action</h2><p>${esc(rank[rank.length-1].z)} has the lowest activity. Consider a collection-point roadshow or a bulky-item swap day there.</p>
@@ -931,7 +1075,7 @@ function vManage(){
   </tbody></table></div>
   <div class="two">
     <div class="card tablewrap"><h2 style="margin-bottom:8px">Points by resident</h2><table class="t" style="min-width:360px"><thead><tr><th>Resident</th><th>Zone</th><th class="n">Balance</th></tr></thead><tbody>
-      ${S.users.slice().sort((a,b)=>(S.points[b.id]||0)-(S.points[a.id]||0)).map(u=>`<tr><td>${u.id==='me'?'You (demo resident)':esc(u.name)}</td><td class="small muted">${esc(u.zone)}</td><td class="n">${fmt(S.points[u.id]||0)}</td></tr>`).join('')}</tbody></table></div>
+      ${S.users.slice().sort((a,b)=>(S.points[b.id]||0)-(S.points[a.id]||0)).map(u=>`<tr><td>${esc(u.name)}${u.id==='me'?' (this device)':''}</td><td class="small muted">${esc(u.zone)}</td><td class="n">${fmt(S.points[u.id]||0)}</td></tr>`).join('')}</tbody></table></div>
     <div class="card stack"><h2>Points economy</h2>
       <div class="facts"><div><span class="eyebrow">In circulation</span><b>${fmt(Object.values(S.points).reduce((a,b)=>a+b,0))}</b></div><div><span class="eyebrow">Issued (logged)</span><b>${fmt(issued)}</b></div><div><span class="eyebrow">Redeemed</span><b>${fmt(redeemed)}</b></div></div>
       <p class="small muted">Rates: reuse handover ${PTS.reuse}, receiver ${PTS.receive}, recycling ${PTS.recycle}. Watch for one resident repeatedly handing items to the same neighbour.</p></div>
@@ -954,11 +1098,11 @@ function vShowAdmin(){
 }
 
 /* ---------- overlays ---------- */
-function sheet(html){ document.getElementById('overlay').innerHTML = `<div class="scrim" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; afterRender(); }
+function sheet(html, cls=''){ document.getElementById('overlay').innerHTML = `<div class="scrim ${cls}" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; afterRender(); }
 function closeSheet(){ stopScanner(); document.getElementById('overlay').innerHTML=''; }
 function toast(t){ const h=document.getElementById('toastHost'); h.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>h.innerHTML='',2800); }
 function showNotifs(){
-  const who = S.role==='admin'?'admin':'me';
+  const who = isAdmin()?'admin':'me';
   const list = S.notifs.filter(n=>n.userId===who).slice(0,20);
   sheet(`<div class="sheet-head"><h2>Notifications</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
     ${list.length?`<div>${list.map(n=>`<div class="notif ${n.read?'':'unread'}"><b style="font-weight:500">${esc(n.text)}</b><span class="small muted">${new Date(n.at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}</span></div>`).join('')}</div>`:'<p class="muted">Nothing yet.</p>'}`);
@@ -1015,48 +1159,70 @@ function confirmPickup(l){
 }
 
 /* ---------- events ---------- */
-document.addEventListener('click', async ev=>{
+// Ignore taps that land within a moment of scrolling (a swipe on the phone shouldn't press buttons).
+let lastScroll = 0;
+addEventListener('scroll', ()=>{ lastScroll = Date.now(); }, {passive:true, capture:true});
+addEventListener('touchmove', ()=>{ lastScroll = Date.now(); }, {passive:true});
+document.addEventListener('click', ev=>{
   const t = ev.target.closest('[data-act]'); if(!t) return;
   const a = t.dataset.act, v = t.dataset.v;
-  if(a==='close-bg'){ if(ev.target===t) closeSheet(); return; }
+  if(a==='close-bg'){ if(ev.target===t){ pendingConfirm=null; closeSheet(); } return; }
+  if(Date.now()-lastScroll < 250 && a!=='close'){ ev.preventDefault(); return; }
+  doAct(a, v, t);
+});
+function doAct(a, v, t){
+  const L = id => S.listings.find(x=>x.id===id);
   switch(a){
-    case 'role': S.role=v; save(); render(); window.scrollTo(0,0); break;
-    case 'go': if(S.role==='admin' && ADM_NAV.some(n=>n[0]===v)) S.adminView=v; else { S.role='resident'; S.view=v; } save(); render(); window.scrollTo(0,0); break;
+    case 'go': if(isAdmin()){ if(ADM_NAV.some(n=>n[0]===v)) S.adminView=v; } else if(RES_NAV.some(n=>n[0]===v)) S.view=v;
+      save(); render(); window.scrollTo(0,0); break;
     case 'notifs': showNotifs(); break;
-    case 'close': closeSheet(); break;
-    case 'skip': S.dayOffset++; processClock(); save(); render(); toast(`Clock moved to day +${S.dayOffset}`); break;
-    case 'reset': if(t.dataset.confirm){ try{localStorage.removeItem(KEY)}catch(e){} S=seed(); resetSnap(); processClock(); save(); render(); toast('Demo data reset'); }
-      else { t.dataset.confirm='1'; t.textContent='Tap again to reset'; setTimeout(()=>{ if(t.isConnected){ delete t.dataset.confirm; t.textContent='Reset demo data'; } },3000); } break;
-    case 'ex': U.snap.desc=v; render(); break;
+    case 'account': showAccount(); break;
+    case 'close': pendingConfirm=null; closeSheet(); break;
+    case 'confirm-yes': { const fn=pendingConfirm; pendingConfirm=null; closeSheet(); if(fn) fn(); break; }
+    case 'gate-mode': U.gate={mode:v,err:'',busy:false,id:''}; render(); break;
+    case 'logout': confirmSheet({title:'Sign out of WasteLoop?', body:'Your listings and points stay on this phone.', ok:'Sign out', tone:'danger'}, ()=>{
+        setSession(null); resetSnap(); U.gate={mode:'resident',err:'',busy:false,id:''}; render(); window.scrollTo(0,0); }); break;
+    case 'skip': closeSheet(); S.dayOffset++; processClock(); save(); render(); toast(`Clock moved to day +${S.dayOffset}`); break;
+    case 'reset': confirmSheet({title:'Reset all demo data?', body:'Listings, points, notifications and weigh-ins on this phone go back to the sample data. You stay signed in.', ok:'Reset', tone:'danger'}, ()=>{
+        try{localStorage.removeItem(KEY)}catch(e){} S=seed(); applySession(); resetSnap(); processClock(); save(); render(); toast('Demo data reset'); }); break;
     case 'dismiss-install': try{ localStorage.setItem('wl-install-dismissed','1'); }catch(e){} render(); break;
-    case 'analyze': U.snap.desc = document.getElementById('desc')?.value||U.snap.desc; analyze(); break;
     case 'cancel-ai': U.ctl?.abort(); break;
     case 'manual': { const sn=U.snap; sn.result={isItem:true,item:(sn.desc||'My item').slice(0,40),category:'other',description:sn.desc,condition:'fair',route:'reuse',confidence:0,reason:'Route chosen by you (AI unavailable).',material:'—',weightKg:3,valueRm:0,tip:''}; sn.route='reuse'; sn.title=sn.result.item; sn.descEdit=sn.desc; sn.stage='result'; render(); break; }
     case 'new-snap': resetSnap(); render(); window.scrollTo(0,0); break;
     case 'route': U.snap.route=v; keepEdits(); render(); break;
     case 'mode': keepEdits(); U.snap.mode=v; render(); break;
     case 'ask': askWhy(v); break;
-    case 'post': postListing(); break;
-    case 'to-recycle': sendRecycle(); break;
+    case 'post': keepEdits(); confirmSheet({title:`Post “${(U.snap.title||U.snap.result.item).slice(0,60)}”?`, body:`Neighbours can claim it for ${LIST_DAYS} days. If no one does, it goes to SDP recycling.`, ok:'Post listing'}, postListing); break;
+    case 'to-recycle': confirmSheet({title:'Send to SDP recycling?', body:`It joins the collection queue for ${user('me').zone}. You get ${PTS.recycle} points when SDP collects it.`, ok:'Add to queue'}, sendRecycle); break;
     case 'done-dispose': resetSnap(); render(); toast('Thanks for disposing safely'); break;
     case 'mtab': S.marketTab=v; save(); render(); break;
     case 'cat': S.cat=v; render(); break;
-    case 'claim': { const l=S.listings.find(x=>x.id===v); if(!l||l.status!=='open') break; l.status='reserved'; l.claimerId='me';
-      notify(l.ownerId,`A neighbour claimed “${l.title}”.`); save(); render(); toast(`Reserved. Scan ${user(l.ownerId).name}'s QR at pickup.`); break; }
+    case 'claim': { const l=L(v); if(!l||l.status!=='open') break;
+      confirmSheet({title:`${l.mode==='swap'?'Offer a swap for':'Claim'} “${l.title}”?`, body:`It will be reserved for you. Collect it from ${user(l.ownerId).name} in ${l.zone} and scan their QR at pickup.`, ok:l.mode==='swap'?'Offer swap':'Reserve it'}, ()=>{
+        if(l.status!=='open') return; l.status='reserved'; l.claimerId='me';
+        notify(l.ownerId,`A neighbour claimed “${l.title}”.`); save(); render(); toast(`Reserved. Scan ${user(l.ownerId).name}'s QR at pickup.`); }); break; }
     case 'scan': showScan(v); break;
     case 'show-qr': showQR(v); break;
-    case 'sim-claim': { const l=S.listings.find(x=>x.id===v); if(!l) break; const nb=S.users.filter(u=>u.id!=='me')[Math.floor(Math.random()*5)];
-      l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`); save(); render(); showQR(l.id); break; }
-    case 'sim-scan': { const l=S.listings.find(x=>x.id===v); if(!l) break; confirmPickup(l); save(); closeSheet(); render(); toast(`Handover confirmed. +${PTS.reuse} points`); break; }
+    case 'sim-claim': { const l=L(v); if(!l) break;
+      confirmSheet({title:'Simulate a neighbour claim?', body:'Prototype tool: a sample neighbour reserves your item so you can demo the QR handover.', ok:'Simulate'}, ()=>{
+        const nb=S.users.filter(u=>u.id!=='me')[Math.floor(Math.random()*5)];
+        l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`); save(); render(); showQR(l.id); }); break; }
+    case 'sim-scan': { const l=L(v); if(!l) break; confirmPickup(l); save(); closeSheet(); render(); toast(`Handover confirmed. +${PTS.reuse} points`); break; }
     case 'unwish': S.wishlist=S.wishlist.filter(w=>w.id!==v); save(); render(); break;
-    case 'redeem': { const r=S.rewards.find(x=>x.id===v); if(!r||S.points.me<r.cost) break; award('me',-r.cost,`Redeemed: ${r.name}`);
-      S.redemptions.unshift({name:r.name,partner:r.partner,code:'EL-'+code6(),at:now()}); save(); render(); toast(`Redeemed ${r.name}`); break; }
-    case 'collected': { const l=S.listings.find(x=>x.id===v); if(!l) break; l.status='recycled'; l.doneAt=now(); award(l.ownerId,PTS.recycle,`Recycled: ${l.title}`);
-      if(l.ownerId==='me'){ S.mine.kg+=l.weightKg; S.mine.co2+=co2For(l.category,'recycle',l.weightKg); }
-      notify(l.ownerId,`SDP collected “${l.title}” for recycling. +${PTS.recycle} points.`); save(); render(); toast('Logged as collected'); break; }
-    case 'remove': { const l=S.listings.find(x=>x.id===v); if(!l) break; l.status='removed'; notify(l.ownerId,`SDP removed your listing “${l.title}” for review.`); save(); render(); toast('Listing removed'); break; }
+    case 'redeem': { const r=S.rewards.find(x=>x.id===v); if(!r||S.points.me<r.cost) break;
+      confirmSheet({title:`Redeem ${r.name}?`, body:`${fmt(r.cost)} points will be used. You'll have ${fmt(S.points.me-r.cost)} left.`, ok:'Redeem'}, ()=>{
+        if(S.points.me<r.cost) return; award('me',-r.cost,`Redeemed: ${r.name}`);
+        S.redemptions.unshift({name:r.name,partner:r.partner,code:'EL-'+code6(),at:now()}); save(); render(); toast(`Redeemed ${r.name}`); }); break; }
+    case 'collected': { const l=L(v); if(!l) break;
+      confirmSheet({title:`Mark “${l.title}” as collected?`, body:`${user(l.ownerId).name} gets ${PTS.recycle} points and ${fmt(l.weightKg,1)} kg goes into the ESG record.`, ok:'Mark collected'}, ()=>{
+        if(l.status!=='scheduled') return; l.status='recycled'; l.doneAt=now(); award(l.ownerId,PTS.recycle,`Recycled: ${l.title}`);
+        if(l.ownerId==='me'){ S.mine.kg+=l.weightKg; S.mine.co2+=co2For(l.category,'recycle',l.weightKg); }
+        notify(l.ownerId,`SDP collected “${l.title}” for recycling. +${PTS.recycle} points.`); save(); render(); toast('Logged as collected'); }); break; }
+    case 'remove': { const l=L(v); if(!l) break;
+      confirmSheet({title:`Remove “${l.title}”?`, body:'It disappears from the marketplace and the owner is told it is under review.', ok:'Remove listing', tone:'danger'}, ()=>{
+        if(l.status!=='open') return; l.status='removed'; notify(l.ownerId,`SDP removed your listing “${l.title}” for review.`); save(); render(); toast('Listing removed'); }); break; }
   }
-});
+}
 document.addEventListener('change', async ev=>{
   if(ev.target.id==='photo'){ const f=ev.target.files?.[0]; if(!f) return;
     try{ const {blob,thumb}=await toBlobs(f); U.snap.blob=blob; U.snap.photo=thumb; U.snap.desc=document.getElementById('desc')?.value||U.snap.desc; if(U.snap.stage==='error') U.snap.stage='idle'; render(); }
@@ -1070,22 +1236,28 @@ document.addEventListener('drop', ev=>{ const dz=ev.target.closest?.('#drop'); i
   const f=ev.dataTransfer?.files?.[0]; if(f){ const inp=document.getElementById('photo'); const dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; inp.dispatchEvent(new Event('change',{bubbles:true})); } });
 document.addEventListener('submit', ev=>{
   const f = ev.target.closest('[data-form]'); if(!f) return; ev.preventDefault();
-  const k = f.dataset.form;
+  const k = f.dataset.form, val = id => (document.getElementById(id)?.value||'').trim();
+  if(k==='login'){ doLogin(); return; }
+  if(k==='snap'){ U.snap.desc = document.getElementById('desc')?.value||''; if(U.snap.photo||U.snap.desc.trim()) analyze(); return; }
   if(k==='ask'){ const i=document.getElementById('chatq'); const q=i.value; i.value=''; askWhy(q); }
-  if(k==='wish'){ const i=document.getElementById('wishText'); const txt=i.value.trim(); if(!txt) return; S.wishlist.unshift({id:uid('w'),userId:'me',text:txt.slice(0,80),category:'other',at:now()});
+  if(k==='wish'){ const txt=val('wishText'); if(!txt) return; S.wishlist.unshift({id:uid('w'),userId:'me',text:txt.slice(0,80),category:'other',at:now()});
     const hit = S.listings.find(l=>l.status==='open'&&l.ownerId!=='me'&&txt.toLowerCase().split(/[^a-z0-9]+/).filter(x=>x.length>3).some(w=>(l.title+' '+l.description).toLowerCase().includes(w)));
     if(hit) notify('me',`Good news: “${hit.title}” in ${hit.zone} already matches your wishlist.`);
     save(); render(); toast(hit?'Added. There is already a match, check notifications':'Added to your wishlist'); }
-  if(k==='weigh'){ const kgv=Number(document.getElementById('wk').value); if(!(kgv>0)){ toast('Enter a weight above 0'); return; }
-    S.weighins.unshift({zone:document.getElementById('wz').value,material:document.getElementById('wm').value,kg:kgv,at:now()}); save(); render(); toast(`${fmt(kgv,1)} kg added to the ESG record`); }
-  if(k==='sched'){ const id=f.dataset.v, d=document.getElementById('d_'+id).value; const l=S.listings.find(x=>x.id===id); if(!l||!d) return;
-    l.status='scheduled'; l.pickupDate=d; notify(l.ownerId,`SDP will collect “${l.title}” on ${d}. Leave it at your bin area that morning.`); save(); render(); toast('Pickup scheduled'); }
-  if(k==='code'){ const l=S.listings.find(x=>x.id===f.dataset.v); const c=document.getElementById('codeIn').value.trim().toUpperCase();
+  if(k==='weigh'){ const kgv=Number(val('wk')), zone=val('wz'), mat=val('wm'); if(!(kgv>0)){ toast('Enter a weight above 0'); return; }
+    confirmSheet({title:`Add ${fmt(kgv,1)} kg to the ESG record?`, body:`${CAT[mat]?.label||mat} from the ${zone} collection point.`, ok:'Add weigh-in'}, ()=>{
+      S.weighins.unshift({zone,material:mat,kg:kgv,at:now()}); save(); render(); toast(`${fmt(kgv,1)} kg added to the ESG record`); }); }
+  if(k==='sched'){ const id=f.dataset.v, d=val('d_'+id); const l=S.listings.find(x=>x.id===id); if(!l||!d) return;
+    confirmSheet({title:`Schedule pickup on ${d}?`, body:`${user(l.ownerId).name} will be told to leave “${l.title}” at their bin area that morning.`, ok:'Schedule'}, ()=>{
+      if(l.status!=='routed') return; l.status='scheduled'; l.pickupDate=d; notify(l.ownerId,`SDP will collect “${l.title}” on ${d}. Leave it at your bin area that morning.`); save(); render(); toast('Pickup scheduled'); }); }
+  if(k==='code'){ const l=S.listings.find(x=>x.id===f.dataset.v); const c=val('codeIn').toUpperCase();
     if(!l) return; if(c!==l.code){ toast('That code does not match. Check the owner\'s screen.'); return; }
     confirmPickup(l); save(); closeSheet(); render(); toast(`Pickup confirmed. +${PTS.receive} points, and ${user(l.ownerId).name} got +${PTS.reuse}`); }
-  if(k==='show'){ const g=id=>document.getElementById(id).value.trim(); if(!g('sp_t')||!(Number(g('sp_k'))>0)){ toast('Add a name and the weight reused'); return; }
-    S.showcase.unshift({id:uid('s'),title:g('sp_t'),material:g('sp_m')||'Construction surplus',kg:Number(g('sp_k')),location:g('sp_l')||'Elmina',date:new Date(now()).toISOString().slice(0,7),shape:g('sp_s'),note:g('sp_n')});
-    S.users.forEach(u=>notify(u.id,`New SDP Showcase project: ${g('sp_t')}.`)); save(); render(); toast('Published to residents'); }
+  if(k==='show'){ const p={title:val('sp_t'),material:val('sp_m'),kg:Number(val('sp_k')),location:val('sp_l'),shape:val('sp_s'),note:val('sp_n')};
+    if(!p.title||!(p.kg>0)){ toast('Add a name and the weight reused'); return; }
+    confirmSheet({title:`Publish “${p.title}” to residents?`, body:'Every resident gets a notification and sees it on their Impact page.', ok:'Publish'}, ()=>{
+      S.showcase.unshift({id:uid('s'),title:p.title,material:p.material||'Construction surplus',kg:p.kg,location:p.location||'Elmina',date:new Date(now()).toISOString().slice(0,7),shape:p.shape,note:p.note});
+      S.users.forEach(u=>notify(u.id,`New SDP Showcase project: ${p.title}.`)); save(); render(); toast('Published to residents'); }); }
 });
 function keepEdits(){ const sn=U.snap; const lt=document.getElementById('lt'), ld=document.getElementById('ld'), sf=document.getElementById('sf');
   if(lt) sn.title=lt.value; if(ld) sn.descEdit=ld.value; if(sf) sn.swapFor=sf.value; }
@@ -1105,7 +1277,11 @@ function sendRecycle(){
   resetSnap(); save(); render(); toast(`Added to SDP collection. +${PTS.recycle} points on pickup`);
 }
 
-processClock(); save(); render();
+processClock(); if(SESSION) applySession(); save(); render();
+// Re-check the saved sign-in with the server (skipped quietly when offline).
+if(SESSION) fetch('api/session',{method:'POST',headers:{Authorization:'Bearer '+SESSION.token}})
+  .then(r=>{ if(r.status===401){ setSession(null); U.gate={mode:'resident',err:'Your sign-in expired. Sign in again.',busy:false,id:''}; render(); } })
+  .catch(()=>{});
 })();
 </script>
 <script>

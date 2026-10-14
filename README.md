@@ -12,6 +12,9 @@ manifest.webmanifest  app name, icon, colours for "Add to Home Screen"
 sw.js                 offline support
 icons/                home-screen icons
 api/_ai.js            talks to Gemini (free) or Claude (paid), key stays on server
+api/_auth.js          resident / staff accounts and signed sign-in tokens
+api/login.js          sign in   (POST /api/login)
+api/session.js        checks a saved sign-in is still valid
 api/analyze.js        AI photo sorting  (POST /api/analyze)
 api/chat.js           "Ask the AI why"  (POST /api/chat)
 api/health.js         tells the app whether AI is switched on
@@ -55,10 +58,40 @@ Share the same link with your teammates and judges, and each of them can install
 
 ---
 
+## Sign-in: residents and SDP staff are separate
+
+Nobody can use the app without signing in, and the AI only answers signed-in users, so strangers can't use up your free Gemini quota.
+
+- **Residents** sign in with their **unit number + resident PIN** and only see the resident app (Home, Market, Impact, Rewards).
+- **SDP staff** tap **"SDP staff? Sign in here"** and use **staff ID + password**. They only see the admin console (ESG, Heatmap, Collection, Listings, Showcase).
+
+**Demo accounts** work out of the box and are shown on the sign-in screen until you set your own:
+
+| Who | ID | PIN / password |
+|---|---|---|
+| Resident (Aina, Elmina Green 2) | `EG2-08-12` | `1234` |
+| Resident (Farid, Elmina East) | `EE-02-07` | `5678` |
+| SDP staff | `SDP-ADMIN` | `elmina2026` |
+
+**To set real accounts**, add these in Vercel → Settings → Environment Variables, then redeploy. The demo accounts and the hint on the sign-in screen disappear automatically.
+
+| Variable | Format (comma between people) |
+|---|---|
+| `RESIDENT_ACCOUNTS` | `unit:PIN:Name:Zone`, e.g. `EG2-08-12:4821:Aina:Elmina Green 2, EW-03-05:9930:Hafiz:Elmina West` |
+| `ADMIN_ACCOUNTS` | `staffID:password:Name`, e.g. `SDP001:a-long-password:Nadia` |
+| `SESSION_SECRET` | any long random text. It signs sign-ins; changing it signs everyone out. |
+
+Zone must be one of: Elmina Green 1, Elmina Green 2, Elmina West, Elmina East, Elmina Lakeside.
+
+## Accidental taps
+
+Important actions (claim, redeem, post, send to recycling, remove listing, schedule pickup, mark collected, weigh-in, publish showcase, sign out, reset) open a confirmation sheet first. The Confirm button stays inactive for a moment so the same swipe can't press it, and taps that land right after scrolling are ignored.
+
 ## If something goes wrong
 
 | What you see | Fix |
 |---|---|
+| "Unit number or PIN is incorrect" | Check the account in `RESIDENT_ACCOUNTS` (or use the demo account). IDs are not case-sensitive. |
 | "AI sorting is offline right now" | The key is missing. Add `GEMINI_API_KEY` in Vercel, then redeploy. |
 | "Too many requests just now" | You hit the free per-minute or daily limit. Wait a minute, or try again tomorrow. |
 | "Something went wrong reaching the AI" and Vercel logs mention the model | Google renamed or retired the model. In AI Studio, find a current free **Flash** model name, then set `GEMINI_MODEL` to it in Vercel and redeploy. |
@@ -69,12 +102,14 @@ Share the same link with your teammates and judges, and each of them can install
 - **Real QR scanning at pickup:** the receiver's camera scans the owner's handover QR. Typing the 6-character code still works as a backup.
 - **Offline:** the app opens without a connection. Only AI sorting needs the internet.
 - **No AI key at all?** Everything else still works, and residents pick the route themselves.
-- **Admin view:** tap **SDP Admin** at the top.
+- **Admin view:** sign in as SDP staff.
+- **Prototype controls** (skip a day, reset demo data) and **Sign out** are under the round initials button, top right.
 
 ## Current limits
 
+- **Sign-in is checked by the server**, but listings and points are still stored on each phone, so a technical user could edit their own phone's data.
 - **Data is stored on each phone.** Two phones won't see each other's posts yet. A shared database (Supabase and Firebase both have free tiers) is the next step.
-- Neighbours, history and the first listings are **sample data**. Use **Reset demo data** in the side menu (desktop) to start fresh.
+- Neighbours, history and the first listings are **sample data**. Use **Reset demo data** under the initials button to start fresh.
 - CO₂ factors are rough estimates. Replace them with SDP's audited factors before reporting.
 - **App Store version** needs a Mac with Xcode and an Apple Developer account (USD 99 per year). The project can be wrapped with **Capacitor** later.
 
