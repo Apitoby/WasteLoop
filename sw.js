@@ -1,6 +1,6 @@
 // Offline support: the app shell loads without a connection.
 // AI calls (/api/*) always go to the network.
-const CACHE = 'wasteloop-v3';
+const CACHE = 'wasteloop-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {

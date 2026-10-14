@@ -194,12 +194,27 @@ textarea{resize:vertical;min-height:70px}
 .mini b{font-family:var(--f-display);font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums}
 
 /* snap flow */
-.analyzing{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:center}
+.analyzing{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:start}
 .photo{width:100%;max-width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;background:var(--surface-2);display:block}
 .scanwrap{position:relative;overflow:hidden;border-radius:12px}
 .scanwrap::after{content:"";position:absolute;left:0;right:0;height:3px;background:var(--accent);box-shadow:0 0 16px 4px var(--orange);top:0;animation:scan 1.8s ease-in-out infinite alternate}
 @keyframes scan{to{top:calc(100% - 3px)}}
 @media (prefers-reduced-motion:reduce){.scanwrap::after{animation:none;top:50%}}
+.prog{display:flex;flex-direction:column;gap:8px}
+.prog-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.prog-top b{font-size:.95rem}
+.prog-top .mono{font-weight:700;color:var(--accent-text)}
+.prog-bar{height:8px;background:var(--surface-2);border-radius:5px;overflow:hidden}
+.prog-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--orange) 70%,var(--red));border-radius:5px;transition:width .25s linear}
+.steps{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted)}
+.steps li{display:flex;align-items:center;gap:8px}
+.steps li::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line);flex:none;box-sizing:border-box}
+.steps li.now{color:var(--ink);font-weight:700}
+.steps li.now::before{border-color:var(--orange);border-top-color:transparent;animation:spin .8s linear infinite}
+.steps li.done{color:var(--ink)}
+.steps li.done::before{content:"\2713";background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:9px;font-weight:900;line-height:10px;text-align:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.steps li.now::before{animation:none}.prog-bar i{transition:none}}
 .verdict{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:18px}
 @media (max-width:620px){.verdict{grid-template-columns:minmax(0,1fr)}.verdict .photo{max-width:160px}}
 .stamp{display:inline-flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.3rem;letter-spacing:-.02em;padding:3px 12px 3px 5px;border-radius:11px;border:2.5px solid currentColor;transform:rotate(-1.5deg)}
@@ -595,7 +610,7 @@ async function analyze(){
   const sn = U.snap;
   if(!U.sample) await checkAI();
   if(!U.sample){ sn.stage='error'; sn.err='The AI server is not connected yet (see the README to add your API key). You can choose a route yourself for now.'; render(); return; }
-  sn.stage='analyzing'; sn.err=''; sn.chat=[]; render();
+  sn.stage='analyzing'; sn.err=''; sn.chat=[]; startProgress(); render();
   U.ctl = new AbortController();
   try{
     const opts = {signal:U.ctl.signal};
@@ -612,8 +627,11 @@ async function analyze(){
       tip:String(j.handling_tip||''),
     };
     sn.route = route; sn.title = sn.result.item; sn.descEdit = sn.result.description;
+    await finishProgress();
+    if(sn.stage!=='analyzing') return;   // stopped while finishing
     sn.stage='result';
   }catch(e){
+    stopProgress();
     if(e?.code==='cancelled'||e?.name==='AbortError'){ sn.stage='idle'; }
     else if(e instanceof TypeError){ sn.stage='error'; sn.err='No internet connection. AI sorting needs to be online; your listings and points still work offline.'; }
     else { sn.stage='error'; sn.err = errCopy(e?.code) + (e?.message && !['not_granted','rate_limited'].includes(e?.code) ? ` (Details: ${String(e.message).slice(0,200)})` : ''); }
@@ -799,10 +817,54 @@ function vAnalyzing(){
   const sn = U.snap;
   return `<div class="card analyzing">
     <div class="scanwrap">${sn.photo?`<img class="photo" src="${sn.photo}" alt="Your photo">`:`<div class="photo" style="display:grid;place-items:center">${glyph('other')}</div>`}</div>
-    <div class="stack" style="gap:6px"><span class="eyebrow">AI Smart Snap</span><h2>Sorting your item…</h2>
-      <p class="small muted">Checking reuse first, then recycle, then dispose. Usually 5 to 30 seconds.</p>
+    <div class="stack" style="gap:8px;min-width:0"><span class="eyebrow">AI Smart Snap</span>
+      ${progressHtml()}
       <div><button class="btn sm" data-act="cancel-ai">Stop</button></div></div>
   </div>`;
+}
+/* ---------- scan progress ----------
+   The AI answers in one request and does not report its own steps, so the bar is paced by time:
+   it eases toward 92% and only reaches 100% when the real answer has arrived. */
+function progSteps(){
+  return [
+    [0,  U.snap.blob ? 'Uploading photo' : 'Reading your description'],
+    [15, 'Identifying the item'],
+    [35, 'Checking its condition'],
+    [55, 'Choosing reuse, recycle or dispose'],
+    [75, 'Writing the listing description'],
+    [100,'Scan complete'],
+  ];
+}
+function progressHtml(){
+  const pct = U.prog?.pct || 0, steps = progSteps();
+  const cur = steps.filter(([at])=>pct>=at).pop();
+  return `<div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}" id="pg">
+    <div class="prog-top"><b id="pgStep">${esc(cur[1])}${pct<100?'…':''}</b><span class="mono" id="pgPct">${Math.round(pct)}%</span></div>
+    <div class="prog-bar"><i id="pgBar" style="width:${pct}%"></i></div>
+    <ol class="steps" id="pgSteps">${steps.slice(0,-1).map(([at,label],i)=>{
+      const next = steps[i+1][0], st = pct>=next ? 'done' : pct>=at ? 'now' : '';
+      return `<li class="${st}">${esc(label)}</li>`; }).join('')}</ol>
+  </div>`;
+}
+function paintProgress(){
+  const el = document.getElementById('pg'); if(!el) return;
+  el.outerHTML = progressHtml();
+}
+function startProgress(){
+  stopProgress();
+  U.prog = {t0:Date.now(), pct:0, timer:null};
+  U.prog.timer = setInterval(()=>{
+    const t = (Date.now()-U.prog.t0)/1000;
+    U.prog.pct = Math.min(92, 92*(1-Math.exp(-t/8)));   // ~45% at 5s, ~70% at 10s, ~90% at 30s
+    paintProgress();
+  }, 250);
+}
+function stopProgress(){ if(U.prog?.timer) clearInterval(U.prog.timer); if(U.prog) U.prog.timer=null; }
+async function finishProgress(){
+  stopProgress(); if(!U.prog) return;
+  U.prog.pct = 100; paintProgress();
+  const stop = document.querySelector('[data-act=cancel-ai]'); if(stop) stop.hidden = true;
+  await new Promise(r=>setTimeout(r, 700));   // let "Scan complete" show for a moment
 }
 function vResult(){
   const sn = U.snap, r = sn.result, route = sn.route;
