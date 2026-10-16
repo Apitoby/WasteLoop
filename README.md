@@ -99,6 +99,10 @@ Demo marketplace items and SDP Showcase projects show a drawn symbol until you a
 - **Tap a photo to inspect it.** Item and Showcase photos show in full inside their box (nothing cropped). Tapping one opens it full screen with its name.
 - **List your item** lives in Market (and the "List your item" button on Home). Snap or describe the item, tap **Check with AI**, review, then post or send to recycling.
 - **Notifications open the right page.** For example, a claim on your item opens My listings, and a wishlist match opens the marketplace.
+- **Claims page** (new tab): *To collect* (items you claimed), *My items* (claimed by neighbours, waiting to be claimed, sent to recycling) and *History* (received and given away).
+- **Pickup chat.** Claiming an item opens a chat with the owner. If the owner isn't home, they leave the item at the door and tap **Share pickup code**. The collector enters that code (or scans the QR) to confirm. In this prototype the other person is a sample neighbour with scripted replies. Real person-to-person chat needs the shared database.
+- **Home page** shows your pickups, nearby free items, what neighbours are looking for, points progress to the next reward, the latest SDP Showcase project and last month's township total.
+- **Launch screen.** Each time the app is opened, a short WasteLoop animation plays (about 2.5 seconds). Tap anywhere to skip it. Reloading during the same visit skips it automatically.
 - **Light mode by default.** Change it under the initials button → Settings → Theme (Light, Dark or System). The choice is remembered on that phone.
 
 ## Money saved (RM)

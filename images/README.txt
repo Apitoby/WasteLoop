@@ -20,6 +20,12 @@ images/market/
   plastic-drawers.jpg      Cracked plastic storage drawers
   crt-monitor.jpg          Old CRT monitor
   office-chair.jpg         Office swivel chair
+  standing-fan.jpg         Standing fan, 16-inch
+  baby-car-seat.jpg        Baby car seat
+  rice-cooker.jpg          Rice cooker, 1.8L
+  shoe-rack.jpg            Shoe rack, 3-tier
+  baby-bouncer.jpg         Baby bouncer
+  dining-chairs.jpg        Dining chairs (set of 2)
 
 images/showcase/
   lakeside-gazebo-before.jpg    lakeside-gazebo-after.jpg

@@ -191,6 +191,50 @@ textarea{resize:vertical;min-height:70px}
 .cta span.t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .cta small{color:color-mix(in oklab,var(--bar-ink) 70%,transparent);font-size:.82rem}
 .cta .go{font-weight:800;color:var(--accent)}
+/* chat */
+.scrim.tall .sheet{height:min(720px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:hidden;padding:16px}
+.chatwrap{display:flex;flex-direction:column;gap:10px;height:100%;min-height:0}
+.chatlog{flex:1;min-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px}
+.sysmsg{align-self:center;font-size:.76rem;color:var(--muted);background:var(--surface-2);padding:4px 10px;border-radius:999px;text-align:center}
+.codechip{display:block;font-family:var(--f-mono);font-weight:800;letter-spacing:.22em;font-size:1.25rem;margin-top:4px}
+.bubble .when{display:block;font-size:.68rem;opacity:.6;margin-top:3px}
+.pickup-tip{display:flex;gap:8px;align-items:flex-start;background:var(--accent-soft);border-radius:10px;padding:9px 11px;font-size:.82rem}
+.pickup-tip svg{width:17px;height:17px;flex:none;color:var(--accent-text);margin-top:1px}
+.typing{align-self:flex-start;background:var(--surface-2);border-radius:14px;padding:9px 13px;font-size:.85rem;color:var(--muted)}
+.msgform{display:flex;gap:8px}
+.msgform input{flex:1;min-width:0}
+.udot{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:.68rem;font-weight:800;margin-left:4px}
+/* claims */
+.crow{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.crow:last-child{border-bottom:0}
+.crow .th{width:52px;height:52px;border-radius:10px;background:var(--surface-2);overflow:hidden;display:grid;place-items:center}
+.crow .th img{width:100%;height:100%;object-fit:cover}
+.crow .th .glyph{width:28px;height:28px}
+.crow .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+.crow .tx b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .acts{grid-column:2;display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.grouphead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:4px}
+/* home */
+.homegrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:900px){.homegrid{grid-template-columns:minmax(0,1fr)}}
+.pickups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.pickups button{background:var(--surface);border:0;padding:12px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;color:var(--ink);min-width:0}
+.pickups button:hover{background:var(--surface-2)}
+.pickups b{font-family:var(--f-display);font-size:1.5rem;font-weight:800;line-height:1.1}
+.pickups .hot b{color:var(--accent-text)}
+.pickups span{font-size:.78rem;color:var(--muted);line-height:1.3}
+.ptscard .prog-bar{height:10px}
+.lookfor{display:flex;flex-wrap:wrap;gap:8px}
+.lookfor span{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:.86rem}
+.lookfor span b{font-weight:700}
+.teaser{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;text-align:left;padding:0;color:var(--ink);width:100%}
+.teaser .pic{height:96px;background:color-mix(in oklab,var(--accent) 22%,var(--surface));color:var(--accent-text);display:grid;place-items:center;position:relative;overflow:hidden}
+.teaser .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.teaser .pic svg{width:70px;height:44px}
+.teaser .tx{padding:10px 12px 10px 0;display:flex;flex-direction:column;gap:2px;min-width:0}
+.townbar{display:flex;gap:12px;align-items:center;background:var(--bar);color:var(--bar-ink);border-radius:var(--r);padding:14px 16px}
+.townbar b{font-family:var(--f-display);font-size:1.6rem;font-weight:800;color:var(--accent);white-space:nowrap}
+.townbar span{font-size:.86rem;color:color-mix(in oklab,var(--bar-ink) 80%,transparent)}
 .snapcard{display:flex;flex-direction:column;gap:12px;padding:14px}
 .snap-row{display:flex;gap:12px;align-items:center}
 .snap-row > div{min-width:0}
@@ -461,6 +505,8 @@ input[type=file]{font-size:.85rem;color:var(--muted)}
 (()=>{
 /* ---------- icons ---------- */
 const I = {
+  swap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18l-1 3 4-1.6A8.5 8.5 0 1 0 5 18z"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/></svg>',
   camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.6"/></svg>',
   market:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM4 9c0 1.7 1.3 3 3 3s3-1.3 3-3m0 0c0 1.7 1.3 3 2 3s2-1.3 2-3m0 0c0 1.7 1.3 3 3 3s3-1.3 3-3M10 20v-5h4v5"/></svg>',
@@ -507,6 +553,12 @@ const DEMO_IMG = {
   'Cracked plastic storage drawers':'images/market/plastic-drawers',
   'Old CRT monitor':'images/market/crt-monitor',
   'Office swivel chair':'images/market/office-chair',
+  'Standing fan, 16-inch':'images/market/standing-fan',
+  'Baby car seat':'images/market/baby-car-seat',
+  'Rice cooker, 1.8L':'images/market/rice-cooker',
+  'Shoe rack, 3-tier':'images/market/shoe-rack',
+  'Baby bouncer':'images/market/baby-bouncer',
+  'Dining chairs (set of 2)':'images/market/dining-chairs',
 };
 const SHOW_IMG = { s1:'images/showcase/lakeside-gazebo', s2:'images/showcase/jogging-benches', s3:'images/showcase/planter-boxes' }; // + "-before" / "-after"
 const IMG_EXTS = ['jpg','jpeg','png','webp'];
@@ -635,6 +687,34 @@ S = load();
 if(S.view==='snap') S.view='home';
 if(S.mine.savedRm==null){ S.mine.savedRm=85; S.mine.gaveRm=260; }
 if(S.disposalRate==null) S.disposalRate=150;
+// Adds sample pickups, past handovers and chat threads (runs once per device, and after a reset).
+function upgrade(){
+  S.chats = S.chats || {}; S.chatUnread = S.chatUnread || {}; S.claimsTab = S.claimsTab || 'collect';
+  if(S.claimsSeed) return; S.claimsSeed = 1;
+  const t = Date.now();
+  const mk = o => Object.assign({id:uid('l'),photo:null,mode:'free',swapFor:'',route:'reuse',condition:'good',warned:false,code:code6(),sample:true,createdAt:t-3*DAY,expiresAt:t+4*DAY}, o);
+  const myZone = (S.users.find(u=>u.id==='me')||{}).zone || 'Elmina Green 2';
+  const fan = mk({ownerId:'u5',claimerId:'me',status:'reserved',title:'Standing fan, 16-inch',category:'appliances',description:'Works on all 3 speeds. Remote missing.',weightKg:5,valueRm:45,zone:'Elmina Green 1',createdAt:t-2*DAY,expiresAt:t+5*DAY});
+  const seat = mk({ownerId:'me',claimerId:'u2',status:'reserved',title:'Baby car seat',category:'other',description:'Rear-facing car seat for 0 to 12 months. Covers washed.',weightKg:6,valueRm:120,zone:myZone,createdAt:t-1.5*DAY,expiresAt:t+5.5*DAY});
+  const past = [
+    mk({ownerId:'u2',claimerId:'me',status:'reused',title:'Rice cooker, 1.8L',category:'kitchenware',description:'Works well, inner pot slightly scratched.',weightKg:3,valueRm:60,zone:'Elmina Green 2',createdAt:t-12*DAY,doneAt:t-9*DAY}),
+    mk({ownerId:'u4',claimerId:'me',status:'reused',title:'Shoe rack, 3-tier',category:'furniture',description:'Metal frame, fabric shelves.',weightKg:4,valueRm:25,zone:'Elmina Lakeside',createdAt:t-6*DAY,doneAt:t-4*DAY}),
+    mk({ownerId:'me',claimerId:'u3',status:'reused',title:'Baby bouncer',category:'toys_sports',description:'Foldable bouncer with toy bar.',weightKg:4,valueRm:80,zone:myZone,createdAt:t-24*DAY,doneAt:t-20*DAY}),
+    mk({ownerId:'me',claimerId:'u1',status:'reused',title:'Dining chairs (set of 2)',category:'furniture',description:'Solid wood, one has a loose leg screw.',weightKg:10,valueRm:180,zone:myZone,createdAt:t-9*DAY,doneAt:t-6*DAY}),
+  ];
+  S.listings.push(fan, seat, ...past);
+  S.chats[fan.id] = [
+    {from:'sys',text:'You reserved “Standing fan, 16-inch”.',at:t-1.2*DAY},
+    {from:'me',text:'Hi Daniel, can I collect it this weekend?',at:t-1.1*DAY},
+    {from:'them',text:"Sure! Saturday after 10am is fine. If I'm out I'll leave it at the door and send you the pickup code.",at:t-1.05*DAY},
+  ];
+  S.chats[seat.id] = [
+    {from:'sys',text:'Mei Ling T. reserved your “Baby car seat”.',at:t-0.4*DAY},
+    {from:'them',text:'Hi! Thank you so much, this is perfect for my baby. Can I collect it tomorrow morning?',at:t-0.35*DAY},
+  ];
+  S.chatUnread[seat.id] = 1;
+}
+upgrade();
 
 /* ---------- transient UI state ---------- */
 /* ---------- sign-in ---------- */
@@ -679,7 +759,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 /* ---------- domain ---------- */
 const user = id => S.users.find(u=>u.id===id) || {name:'Neighbour',zone:'—'};
 const co2For = (cat,route,w) => Math.round(((CAT[cat]||CAT.other)[route==='recycle'?'recycle':'reuse']||0)*w*10)/10;
-function notify(userId,text){ S.notifs.unshift({id:uid('n'),userId,text,at:now(),read:false}); }
+function notify(userId,text,lid){ S.notifs.unshift({id:uid('n'),userId,text,at:now(),read:false,lid}); }
 // Where a notification should take you, worked out from what it says.
 function notifTarget(n){
   const t = n.text;
@@ -691,16 +771,20 @@ function notifTarget(n){
   if(/showcase/i.test(t)) return {view:'impact', label:'Impact'};
   if(/wishlist|matches your/i.test(t)) return {view:'market', tab:'feed', label:'Market'};
   if(/redeem|voucher/i.test(t)) return {view:'rewards', label:'Rewards'};
-  if(/claimed your|scanned your|routed|removed your|will collect|collected|your listing|“.*” will be/i.test(t)) return {view:'market', tab:'mine', label:'My listings'};
-  if(/claimed|handover/i.test(t)) return {view:'market', tab:'mine', label:'My listings'};
+  if(/sent you a message|replied|message/i.test(t)) return {view:'claims', ctab: /your “/.test(t)?'mine':'collect', label:'Chat', chat:true};
+  if(/claimed your/i.test(t)) return {view:'claims', ctab:'mine', label:'Claims'};
+  if(/scanned your|handover/i.test(t)) return {view:'claims', ctab:'history', label:'Claims'};
+  if(/routed|removed your|will collect|collected|your listing|“.*” will be/i.test(t)) return {view:'market', tab:'mine', label:'My listings'};
+  if(/claimed/i.test(t)) return {view:'claims', ctab:'mine', label:'Claims'};
   if(/points/i.test(t)) return {view:'rewards', label:'Rewards'};
   return {view:'home', label:'Home'};
 }
 function notifGo(id){
   const n = S.notifs.find(x=>x.id===id); if(!n) return;
   const g = notifTarget(n); closeSheet();
-  if(isAdmin()) S.adminView = g.view; else { S.view = g.view; if(g.tab) S.marketTab = g.tab; }
+  if(isAdmin()) S.adminView = g.view; else { S.view = g.view; if(g.tab) S.marketTab = g.tab; if(g.ctab) S.claimsTab = g.ctab; }
   save(); render(); window.scrollTo(0,0);
+  if(g.chat && n.lid && S.listings.some(l=>l.id===n.lid)) showChat(n.lid);
 }
 function award(userId,pts,reason){ S.points[userId]=(S.points[userId]||0)+pts; S.ledger.unshift({userId,pts,reason,at:now()}); }
 function processClock(){
@@ -836,7 +920,7 @@ Answer the resident's questions briefly (2-4 sentences), practically, in plain E
 function resetSnap(){ U.snap={stage:'idle',photo:null,blob:null,desc:'',result:null,err:'',chat:[],chatBusy:false,mode:'free',swapFor:'',route:null}; }
 
 /* ---------- render: shell ---------- */
-const RES_NAV = [['home','Home',I.home],['market','Market',I.market],['impact','Impact',I.leaf],['rewards','Rewards',I.gift]];
+const RES_NAV = [['home','Home',I.home],['market','Market',I.market],['claims','Claims',I.swap],['impact','Impact',I.leaf],['rewards','Rewards',I.gift]];
 const ADM_NAV = [['esg','ESG',I.chart],['heat','Heatmap',I.grid],['collect','Collection',I.truck],['manage','Listings',I.list],['show','Showcase',I.hammer]];
 const initials = n => String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || '?';
 const MARK = '<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" style="fill:var(--accent)"/><path d="M10 17.5a6 6 0 0 1 10.4-4.1M22 14.5a6 6 0 0 1-10.4 4.1" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M20.6 9.6v3.9h-3.9M11.4 22.4v-3.9h3.9" style="fill:none;stroke:var(--accent-ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -857,7 +941,7 @@ function render(){
   const navHtml = nav.map(([k,l,ic])=>`<button data-act="go" data-v="${k}" ${k===cur?'aria-current="page"':''}><span class="ni">${ic}</span><span>${l}</span></button>`).join('');
   document.getElementById('rail').innerHTML = navHtml;
   document.getElementById('tabbar').innerHTML = navHtml;
-  const views = isAdm ? {esg:vESG,heat:vHeat,collect:vCollect,manage:vManage,show:vShowAdmin} : {home:vHome,market:vMarket,impact:vImpact,rewards:vRewards};
+  const views = isAdm ? {esg:vESG,heat:vHeat,collect:vCollect,manage:vManage,show:vShowAdmin} : {home:vHome,market:vMarket,claims:vClaims,impact:vImpact,rewards:vRewards};
   document.getElementById('main').innerHTML = (views[cur]||Object.values(views)[0])();
   afterRender();
 }
@@ -956,19 +1040,52 @@ function vHome(){
   const install = (!standalone && isIOS && !hideInstall) ? `<div class="install">${I.spark}<div style="flex:1">Install WasteLoop: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.</div><button class="btn sm ghost" data-act="dismiss-install">OK</button></div>` : '';
   const near = S.listings.filter(l=>l.ownerId!=='me' && l.status==='open').sort((a,b)=>a.expiresAt-b.expiresAt).slice(0,3);
   const h = new Date().getHours(), greet = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+  const c = claimSets(), unread = [...c.collect,...c.claimedMine].reduce((a,l)=>a+unreadOf(l.id),0);
+  const pickHtml = `<section class="stack" aria-label="Your pickups">
+    <div class="sec-head"><h2>Your pickups</h2><button class="linkbtn" data-act="go" data-v="claims">Open Claims${unread?` · ${unread} new`:''}</button></div>
+    <div class="pickups">
+      <button class="${c.collect.length?'hot':''}" data-act="go-claims" data-v="collect"><b>${c.collect.length}</b><span>to collect</span></button>
+      <button class="${c.claimedMine.length?'hot':''}" data-act="go-claims" data-v="mine"><b>${c.claimedMine.length}</b><span>claimed from you</span></button>
+      <button data-act="go-claims" data-v="mine"><b>${c.waiting.length}</b><span>waiting for a neighbour</span></button>
+    </div></section>`;
+  const looking = S.wishlist.filter(w=>w.userId!=='me').slice(0,4);
+  const pts = S.points.me, next = S.rewards.slice().sort((a,b)=>a.cost-b.cost).find(r=>r.cost>pts);
+  const sc = S.showcase[0];
+  const lastMonth = esg().byMonth[4];
   return `
   <div class="hello"><span class="eyebrow">${esc(me.zone)}${me.unit?' · Unit '+esc(me.unit):''}</span><h1>${greet}, ${esc(me.name)}</h1></div>
   ${install}
   <button class="cta" data-act="go-list"><span class="cam">${I.camera}</span>
     <span class="t"><b>List your item</b><small>Snap it and AI writes the listing for you</small></span><span class="go">Start →</span></button>
-  <section class="stack">
-    <div class="sec-head"><h2>Free near you</h2><button class="linkbtn" data-act="go" data-v="market">See all</button></div>
-    ${near.length?`<div class="card rowlist" style="padding:2px 14px">${near.map(irow).join('')}</div>`:`<div class="empty">Nothing listed right now. Check back later.</div>`}
-  </section>
-  <section class="stack">
-    <div class="sec-head"><h2>Your impact</h2><button class="linkbtn" data-act="go" data-v="impact">Details</button></div>
-    <div class="mini"><div><span class="eyebrow">Diverted</span><b>${fmt(S.mine.kg,0)} kg</b></div><div><span class="eyebrow">Reused</span><b>${fmt(S.mine.items)}</b></div><div><span class="eyebrow">Saved</span><b>RM ${fmt(S.mine.savedRm+S.mine.gaveRm)}</b></div></div>
-  </section>`;
+  ${pickHtml}
+  <div class="homegrid">
+    <div class="stack" style="gap:20px">
+      <section class="stack">
+        <div class="sec-head"><h2>Free near you</h2><button class="linkbtn" data-act="go" data-v="market">See all</button></div>
+        ${near.length?`<div class="card rowlist" style="padding:2px 14px">${near.map(irow).join('')}</div>`:`<div class="empty">Nothing listed right now. Check back later.</div>`}
+      </section>
+      ${looking.length?`<section class="stack">
+        <div class="sec-head"><h2>Neighbours are looking for</h2><button class="linkbtn" data-act="go-list">Have one? List it</button></div>
+        <div class="lookfor">${looking.map(w=>`<span><b>${esc(w.text)}</b> · ${esc(user(w.userId).zone)}</span>`).join('')}</div>
+      </section>`:''}
+      <section class="stack">
+        <div class="sec-head"><h2>Your impact</h2><button class="linkbtn" data-act="go" data-v="impact">Details</button></div>
+        <div class="mini"><div><span class="eyebrow">Diverted</span><b>${fmt(S.mine.kg,0)} kg</b></div><div><span class="eyebrow">Reused</span><b>${fmt(S.mine.items)}</b></div><div><span class="eyebrow">Saved</span><b>RM ${fmt(S.mine.savedRm+S.mine.gaveRm)}</b></div></div>
+      </section>
+    </div>
+    <div class="stack" style="gap:20px">
+      <section class="card stack ptscard" style="gap:8px">
+        <div class="sec-head"><h2>Green points</h2><button class="linkbtn" data-act="go" data-v="rewards">Rewards</button></div>
+        <div class="row" style="justify-content:space-between"><b class="mono" style="font-size:1.3rem">${fmt(pts)} pts</b><span class="small muted">${next?`${fmt(next.cost-pts)} to go`:'Enough for any reward'}</span></div>
+        <div class="prog-bar"><i style="width:${next?Math.min(100,pts/next.cost*100):100}%"></i></div>
+        <p class="small muted">${next?`Next: <b style="color:var(--ink)">${esc(next.name)}</b> at ${fmt(next.cost)} pts. Give an item away for +${PTS.reuse}.`:'Redeem a reward on the Rewards page.'}</p>
+      </section>
+      ${sc?`<section class="stack"><div class="sec-head"><h2>From SDP</h2><button class="linkbtn" data-act="go" data-v="impact">Showcase</button></div>
+        <button class="teaser" data-act="go" data-v="impact"><span class="pic">${projImg(sc,'after',shapeSvg(sc.shape))}</span>
+          <span class="tx"><b>${esc(sc.title)}</b><span class="small muted">${kg(sc.kg)} of ${esc(sc.material.toLowerCase())} reused · ${esc(sc.location)}</span></span></button></section>`:''}
+      <section class="townbar"><b>${kg(lastMonth.reuseKg+lastMonth.recycleKg)}</b><span>kept out of landfill by Elmina residents in ${MON[lastMonth.mk%12]}. Thank you for being part of it.</span></section>
+    </div>
+  </div>`;
 }
 function irow(l){
   const d = (l.expiresAt-now())/DAY;
@@ -1102,7 +1219,7 @@ function itemCard(l){
   const clock = l.status==='open' ? `<span class="clock ${dleft<=WARN_DAYS?'low':''}">${dleft>=1?Math.floor(dleft)+'d '+Math.floor((dleft%1)*24)+'h':Math.max(0,Math.floor(left/36e5))+'h'} left</span>` : '';
   let act = '';
   if(l.status==='open') act = mine ? `<button class="btn sm" data-act="sim-claim" data-v="${l.id}" title="Prototype: pretend a neighbour claims it">Simulate a claim</button>` : `<button class="btn sm primary" data-act="claim" data-v="${l.id}">${l.mode==='swap'?'Offer swap':"I'll take it"}</button>`;
-  else if(l.status==='reserved') act = mine ? `<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} Show QR</button>` : (l.claimerId==='me'?`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Scan at pickup</button>`:`<span class="pill neutral">Reserved</span>`);
+  else if(l.status==='reserved') act = (mine||l.claimerId==='me') ? `<span class="row" style="gap:6px"><button class="btn sm" data-act="chat" data-v="${l.id}">${I.chat} Chat${unreadOf(l.id)?`<span class="udot">${unreadOf(l.id)}</span>`:''}</button>${mine?`<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} QR</button>`:`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Pick up</button>`}</span>` : `<span class="pill neutral">Reserved</span>`;
   const status = {open:'',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">To recycling</span>',scheduled:'<span class="pill recycle">Pickup scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[l.status]||'';
   return `<article class="item">
     <div class="thumb zoomable" data-act="zoom" data-cap="${esc(l.title)}">${itemThumb(l, l.title)}<span class="zoom-hint" hidden>${ZOOM_ICON}</span>
@@ -1160,6 +1277,62 @@ function vList(){
         <div class="legend3"><span><i class="d reuse"></i>Reuse +${PTS.reuse} pts</span><span><i class="d recycle"></i>Recycle +${PTS.recycle} pts</span><span><i class="d dispose"></i>Dispose 0</span></div>
       </form>
     </div></section>`;
+}
+
+/* ---------- resident: claims ---------- */
+function claimSets(){
+  const L = S.listings, by = (a,b)=>(b.doneAt||b.createdAt)-(a.doneAt||a.createdAt);
+  return {
+    collect: L.filter(l=>l.claimerId==='me' && l.status==='reserved'),
+    claimedMine: L.filter(l=>l.ownerId==='me' && l.status==='reserved'),
+    waiting: L.filter(l=>l.ownerId==='me' && l.status==='open').sort((a,b)=>a.expiresAt-b.expiresAt),
+    recycling: L.filter(l=>l.ownerId==='me' && ['routed','scheduled','recycled'].includes(l.status)),
+    received: L.filter(l=>l.claimerId==='me' && l.status==='reused').sort(by),
+    given: L.filter(l=>l.ownerId==='me' && l.status==='reused').sort(by),
+  };
+}
+function crow(l, sub, acts=''){
+  return `<div class="crow"><span class="th zoomable" data-act="zoom" data-cap="${esc(l.title)}">${itemThumb(l, l.title)}</span>
+    <div class="tx"><b>${esc(l.title)}</b><span class="small muted">${sub}</span></div>${acts?`<div class="acts">${acts}</div>`:''}</div>`;
+}
+function vClaims(){
+  const c = claimSets(), tab = S.claimsTab || 'collect';
+  const d = at => new Date(at).toLocaleDateString('en-MY',{day:'numeric',month:'short'});
+  const left = l => { const x=(l.expiresAt-now())/DAY, d=Math.floor(x), h=Math.max(0,Math.floor(x*24)); return x>=1 ? d+(d===1?' day':' days')+' left' : h+(h===1?' hour':' hours')+' left'; };
+  const chatBtn = l => `<button class="btn sm" data-act="chat" data-v="${l.id}">${I.chat} Chat${unreadOf(l.id)?`<span class="udot">${unreadOf(l.id)}</span>`:''}</button>`;
+  const group = (title, n, inner, empty) => `<div class="grouphead"><h3>${title}</h3><span class="small muted">${n}</span></div>
+    ${n?`<div class="card" style="padding:0 14px">${inner}</div>`:`<div class="empty small">${empty}</div>`}`;
+  let body = '';
+  if(tab==='collect'){
+    body = group('Items you are collecting', c.collect.length, c.collect.map(l=>crow(l,
+      `From ${esc(user(l.ownerId).name)} · ${esc(l.zone)} · <span class="pill warn">Arrange pickup</span>`,
+      chatBtn(l)+`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Pick up</button>`)).join(''),
+      'Nothing to collect. Claim something in the marketplace and it shows up here.')
+      + `<div><button class="btn" data-act="go" data-v="market">Browse the marketplace</button></div>`;
+  } else if(tab==='mine'){
+    body = group('Claimed by neighbours', c.claimedMine.length, c.claimedMine.map(l=>crow(l,
+      `${esc(user(l.claimerId).name)} · ${esc(user(l.claimerId).zone)} · <span class="pill warn">Arrange pickup</span>`,
+      chatBtn(l)+`<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} Show QR</button>`)).join(''),
+      'No one is collecting from you right now.')
+    + group('Waiting to be claimed', c.waiting.length, c.waiting.map(l=>crow(l,
+      `${l.mode==='swap'?'Swap':'Free'} · <span class="clock ${(l.expiresAt-now())/DAY<=WARN_DAYS?'low':''}">${left(l)}</span>`,
+      `<button class="btn sm" data-act="sim-claim" data-v="${l.id}">Simulate a claim</button>`)).join(''),
+      'Nothing waiting. List an item and it appears here until a neighbour claims it.')
+    + (c.recycling.length ? group('Sent to SDP recycling', c.recycling.length, c.recycling.map(l=>crow(l,
+      l.status==='scheduled'?`Pickup on ${esc(l.pickupDate)}`:l.status==='recycled'?'Collected by SDP':'Waiting for SDP to schedule')).join(''), '') : '')
+    + `<div><button class="btn primary" data-act="go-list">${I.camera} List another item</button></div>`;
+  } else {
+    body = group('Received from neighbours', c.received.length, c.received.map(l=>crow(l,
+      `From ${esc(user(l.ownerId).name)} · ${d(l.doneAt)} · saved RM ${fmt(l.valueRm||0)}`)).join(''), 'Nothing received yet.')
+    + group('Given to neighbours', c.given.length, c.given.map(l=>crow(l,
+      `To ${esc(user(l.claimerId).name)} · ${d(l.doneAt)} · +${PTS.reuse} pts`)).join(''), 'Nothing given away yet.');
+  }
+  const n1 = c.collect.length, n2 = c.claimedMine.length + c.waiting.length, n3 = c.received.length + c.given.length;
+  const u1 = c.collect.reduce((a,l)=>a+unreadOf(l.id),0), u2 = c.claimedMine.reduce((a,l)=>a+unreadOf(l.id),0);
+  return `<div class="page-head"><div><span class="eyebrow">Claims</span><h1>Pickups and giveaways</h1>
+    <p class="muted" style="margin-top:6px">Track what you're collecting, what neighbours have claimed from you, and what's still waiting.</p></div></div>
+    <div class="subtabs">${[['collect',`To collect · ${n1}`,u1],['mine',`My items · ${n2}`,u2],['history',`History · ${n3}`,0]].map(([k,l,u])=>`<button data-act="ctab" data-v="${k}" aria-pressed="${tab===k}">${l}${u?`<span class="udot">${u}</span>`:''}</button>`).join('')}</div>
+    <div class="stack" style="gap:12px">${body}</div>`;
 }
 
 /* ---------- resident: impact ---------- */
@@ -1392,7 +1565,82 @@ function openZoom(el){
     <button class="iconbtn lb-x" data-act="close" aria-label="Close photo">${I.x}</button>
     <figure data-act="close-bg"><img src="${im.getAttribute('src')}" alt="${esc(el.dataset.cap||'')}"><figcaption>${esc(el.dataset.cap||'')}</figcaption></figure></div>`;
 }
-function closeSheet(){ stopScanner(); document.getElementById('overlay').innerHTML=''; }
+/* ---------- pickup chat (claimer <-> owner) ----------
+   Prototype: the other side is a sample neighbour whose replies are scripted.
+   With a shared database these messages would go to the real person. */
+const chatOf = id => (S.chats[id] = S.chats[id] || []);
+const otherOf = l => l.ownerId==='me' ? l.claimerId : l.ownerId;
+const unreadOf = id => S.chatUnread?.[id] || 0;
+function chatLogHtml(id){
+  const l = S.listings.find(x=>x.id===id), other = user(otherOf(l));
+  const tm = at => new Date(at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+  return chatOf(id).map(m => m.from==='sys' ? `<span class="sysmsg">${esc(m.text)}</span>`
+    : `<div class="bubble ${m.from==='me'?'me':'ai'}">${esc(m.text)}${m.code?`<span class="codechip">${esc(m.code)}</span>`:''}<span class="when">${m.from==='me'?'You':esc(other.name)} · ${tm(m.at)}</span></div>`).join('')
+    + (U.typing===id ? `<div class="typing">${esc(other.name)} is typing…</div>` : '');
+}
+function paintChat(id){
+  const cl = document.getElementById('cl'); if(!cl || U.chatOpen!==id) return false;
+  cl.innerHTML = chatLogHtml(id); cl.scrollTop = cl.scrollHeight; return true;
+}
+function showChat(id){
+  const l = S.listings.find(x=>x.id===id); if(!l || !otherOf(l)) return;
+  const other = user(otherOf(l)), owner = l.ownerId==='me';
+  U.chatOpen = id; if(S.chatUnread) S.chatUnread[id] = 0; save();
+  const quick = owner ? ['Tomorrow 9am works',"I'll leave it at my door",'Thanks for taking it!']
+                      : ['When can I pick up?','Can you leave it at the door?',"I'm on my way",'Thank you!'];
+  sheet(`<div class="chatwrap">
+    <div class="sheet-head"><div class="row" style="flex-wrap:nowrap;min-width:0"><span class="mthumb">${itemThumb(l)}</span>
+      <div style="min-width:0"><h2>${esc(other.name)}</h2><p class="small muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title)} · ${esc(other.zone)}</p></div></div>
+      <button class="iconbtn" data-act="close" aria-label="Close chat">${I.x}</button></div>
+    <div class="pickup-tip">${I.info}<span>${owner ? 'Not home at pickup time? Leave the item at your door and tap <b>Share pickup code</b>. Your points land when they enter it.' : 'Owner not home? Ask them to leave it at the door and send you the pickup code. Enter it when you collect.'}</span></div>
+    <div class="chatlog" id="cl" aria-live="polite">${chatLogHtml(id)}</div>
+    <div class="chips">${quick.map(q=>`<button class="chip" data-act="qmsg" data-l="${id}" data-v="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+    <div class="row">${owner
+      ? `<button class="btn sm primary" data-act="share-code" data-v="${id}">${I.qr} Share pickup code</button><button class="btn sm" data-act="show-qr" data-v="${id}">Show QR</button>`
+      : `<button class="btn sm primary" data-act="scan" data-v="${id}">${I.qr} Scan QR or enter code</button>`}</div>
+    <form class="msgform" data-form="msg" data-v="${id}"><input type="text" id="msgIn" placeholder="Message ${esc(other.name)}" autocomplete="off" aria-label="Message"><button class="btn primary">Send</button></form>
+    <p class="small muted">Prototype: replies come from a sample neighbour.</p>
+  </div>`, 'bottom tall');
+  const cl = document.getElementById('cl'); if(cl) cl.scrollTop = cl.scrollHeight;
+  render();
+}
+function sendMsg(id, text, extra={}){
+  text = String(text||'').trim(); if(!text) return;
+  chatOf(id).push({from:'me', text:text.slice(0,500), at:now(), ...extra}); save();
+  paintChat(id); scheduleReply(id, text, !!extra.code);
+}
+function replyFor(l, text, sharedCode){
+  const t = text.toLowerCase(), owner = l.ownerId==='me';
+  if(owner){   // you own it; the neighbour who claimed it answers
+    if(sharedCode || /door|leave|code/.test(t)) return {text:"Perfect, I'll collect it this evening and enter the code. Thank you!"};
+    if(/when|time|tomorrow|9am|morning/.test(t)) return {text:'Tomorrow morning around 9am is great. See you then!'};
+    if(/thank/.test(t)) return {text:"You're welcome, and thanks again! It'll be put to good use."};
+    return {text:'Thanks! See you at pickup.'};
+  }
+  // you claimed it; the owner answers
+  if(/door|not (at )?home|away|leave|outside|contactless|code/.test(t))
+    return {text:`No problem, I'm out until 7pm. I'll leave it at my front door. Your pickup code is below. Enter it in WasteLoop when you collect.`, code:l.code};
+  if(/when|time|today|tomorrow|tonight|pick ?up|collect/.test(t)) return {text:"Anytime after 6pm today works. If I'm not in, I can leave it at the door and send you the code."};
+  if(/way|coming|otw|omw|arriv/.test(t)) return {text:'Great, see you soon!'};
+  if(/thank/.test(t)) return {text:"You're welcome, hope it's useful!"};
+  return {text:"Sure! Let me know when you're coming. I can also leave it at the door if that's easier."};
+}
+function scheduleReply(id, text, sharedCode){
+  const l = S.listings.find(x=>x.id===id); if(!l || l.status!=='reserved') return;
+  setTimeout(()=>{ U.typing = id; paintChat(id); }, 500);
+  setTimeout(()=>{
+    U.typing = null;
+    const r = replyFor(l, text, sharedCode), other = user(otherOf(l));
+    chatOf(id).push({from:'them', text:r.text, code:r.code, at:now()});
+    if(!paintChat(id)){
+      S.chatUnread[id] = (S.chatUnread[id]||0) + 1;
+      notify('me', `${other.name} sent you a message about ${l.ownerId==='me'?'your ':''}“${l.title}”.`, id);
+      render();
+    }
+    save();
+  }, 1700);
+}
+function closeSheet(){ U.chatOpen = null; U.typing = null; stopScanner(); document.getElementById('overlay').innerHTML=''; }
 function toast(t){ const h=document.getElementById('toastHost'); h.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>h.innerHTML='',2800); }
 function showNotifs(){
   const who = isAdmin()?'admin':'me';
@@ -1479,11 +1727,12 @@ function doAct(a, v, t){
         setSession(null); resetSnap(); U.gate={mode:'resident',err:'',busy:false,id:''}; render(); window.scrollTo(0,0); }); break;
     case 'skip': closeSheet(); S.dayOffset++; processClock(); save(); render(); toast(`Clock moved to day +${S.dayOffset}`); break;
     case 'reset': confirmSheet({title:'Reset all demo data?', body:'Listings, points, notifications and weigh-ins on this phone go back to the sample data. You stay signed in.', ok:'Reset', tone:'danger'}, ()=>{
-        try{localStorage.removeItem(KEY)}catch(e){} S=seed(); applySession(); resetSnap(); processClock(); save(); render(); toast('Demo data reset'); }); break;
+        try{localStorage.removeItem(KEY)}catch(e){} S=seed(); upgrade(); applySession(); resetSnap(); processClock(); save(); render(); toast('Demo data reset'); }); break;
     case 'dismiss-install': try{ localStorage.setItem('wl-install-dismissed','1'); }catch(e){} render(); break;
     case 'cancel-ai': U.ctl?.abort(); break;
     case 'manual': { const sn=U.snap; sn.result={isItem:true,item:(sn.desc||'My item').slice(0,40),category:'other',description:sn.desc,condition:'fair',route:'reuse',confidence:0,reason:'Route chosen by you (AI unavailable).',material:'—',weightKg:3,valueRm:0,tip:''}; sn.route='reuse'; sn.title=sn.result.item; sn.descEdit=sn.desc; sn.stage='result'; render(); break; }
     case 'new-snap': resetSnap(); render(); window.scrollTo(0,0); break;
+    case 'go-claims': S.view='claims'; S.claimsTab=v; save(); render(); window.scrollTo(0,0); break;
     case 'go-list': S.view='market'; S.marketTab='list'; save(); render(); window.scrollTo(0,0); break;
     case 'zoom': openZoom(t); break;
     case 'notif-go': notifGo(v); break;
@@ -1499,13 +1748,26 @@ function doAct(a, v, t){
     case 'claim': { const l=L(v); if(!l||l.status!=='open') break;
       confirmSheet({title:`${l.mode==='swap'?'Offer a swap for':'Claim'} “${l.title}”?`, body:`It will be reserved for you. Collect it from ${user(l.ownerId).name} in ${l.zone} and scan their QR at pickup.`, ok:l.mode==='swap'?'Offer swap':'Reserve it'}, ()=>{
         if(l.status!=='open') return; l.status='reserved'; l.claimerId='me';
-        notify(l.ownerId,`A neighbour claimed “${l.title}”.`); save(); render(); toast(`Reserved. Scan ${user(l.ownerId).name}'s QR at pickup.`); }); break; }
+        notify(l.ownerId,`A neighbour claimed “${l.title}”.`);
+        chatOf(l.id).push({from:'sys', text:`You reserved “${l.title}”. Arrange pickup with ${user(l.ownerId).name} here.`, at:now()});
+        save(); render(); showChat(l.id);
+        setTimeout(()=>{ U.typing=l.id; paintChat(l.id); }, 700);
+        setTimeout(()=>{ U.typing=null; chatOf(l.id).push({from:'them', text:`Hi! Thanks for claiming the ${l.title.charAt(0).toLowerCase()+l.title.slice(1)}. When would you like to collect it? If I'm not home I can leave it at the door.`, at:now()}); save();
+          if(!paintChat(l.id)){ S.chatUnread[l.id]=(S.chatUnread[l.id]||0)+1; notify('me',`${user(l.ownerId).name} sent you a message about “${l.title}”.`, l.id); render(); } }, 2000);
+      }); break; }
     case 'scan': showScan(v); break;
+    case 'chat': showChat(v); break;
+    case 'qmsg': sendMsg(t.dataset.l, v); break;
+    case 'share-code': { const l=L(v); if(l) sendMsg(v, `I'll leave it at my front door. Here is your pickup code:`, {code:l.code}); break; }
+    case 'ctab': S.claimsTab=v; save(); render(); break;
     case 'show-qr': showQR(v); break;
     case 'sim-claim': { const l=L(v); if(!l) break;
       confirmSheet({title:'Simulate a neighbour claim?', body:'Prototype tool: a sample neighbour reserves your item so you can demo the QR handover.', ok:'Simulate'}, ()=>{
         const nb=S.users.filter(u=>u.id!=='me')[Math.floor(Math.random()*5)];
-        l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`); save(); render(); showQR(l.id); }); break; }
+        l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`, l.id);
+        chatOf(l.id).push({from:'sys', text:`${nb.name} reserved your “${l.title}”.`, at:now()},
+                          {from:'them', text:`Hi! I'd love the ${l.title.charAt(0).toLowerCase()+l.title.slice(1)}. Can I collect it tomorrow morning?`, at:now()});
+        save(); render(); showChat(l.id); }); break; }
     case 'sim-scan': { const l=L(v); if(!l) break; confirmPickup(l); save(); closeSheet(); render(); toast(`Handover confirmed. +${PTS.reuse} points`); break; }
     case 'show-photos': showPhotos(v); break;
     case 'clear-show-photos': { const p=S.showcase.find(x=>x.id===v); if(!p) break;
@@ -1562,6 +1824,7 @@ document.addEventListener('submit', ev=>{
     confirmSheet({title:`Schedule pickup on ${d}?`, body:`${user(l.ownerId).name} will be told to leave “${l.title}” at their bin area that morning.`, ok:'Schedule'}, ()=>{
       if(l.status!=='routed') return; l.status='scheduled'; l.pickupDate=d; notify(l.ownerId,`SDP will collect “${l.title}” on ${d}. Leave it at your bin area that morning.`); save(); render(); toast('Pickup scheduled'); }); }
   if(k==='rate'){ const r=Number(val('rate')); if(!(r>=0)){ toast('Enter a number of ringgit'); return; } S.disposalRate=Math.round(r); save(); render(); toast(`Disposal cost set to RM ${fmt(r)} per tonne`); return; }
+  if(k==='msg'){ const i=document.getElementById('msgIn'); const txt=i.value; i.value=''; sendMsg(f.dataset.v, txt); i.focus(); return; }
   if(k==='code'){ const l=S.listings.find(x=>x.id===f.dataset.v); const c=val('codeIn').toUpperCase();
     if(!l) return; if(c!==l.code){ toast('That code does not match. Check the owner\'s screen.'); return; }
     confirmPickup(l); save(); closeSheet(); render(); toast(`Pickup confirmed. +${PTS.receive} points, and ${user(l.ownerId).name} got +${PTS.reuse}`); }
