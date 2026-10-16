@@ -19,12 +19,12 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-/* Layout: black brand bar with a yellow > orange > red stripe (the 3R order); left rail on desktop, bottom tabs on phone; one content column */
+/* Layout: black brand bar with an orange-led yellow > orange > red stripe; orange is the main colour; left rail on desktop, bottom tabs on phone; one content column */
 :root{
   --bg:#F6F5F2; --surface:#FFFFFF; --surface-2:#EFEDE8; --ink:#121110; --muted:#625D55; --line:#E2DED6;
-  --accent:#FFC21A; --accent-ink:#121110; --accent-soft:#FFF2C2; --accent-text:#8A5E00;
-  --orange:#EE6A12; --red:#D7261E;
-  --reuse:#F5B400; --reuse-ink:#7E5600; --recycle:#EE6A12; --recycle-ink:#A84800; --dispose:#D7261E; --dispose-ink:#B01F18;
+  --accent:#FF6A13; --accent-ink:#121110; --accent-soft:#FFE8D9; --accent-text:#B03E00;
+  --orange:#FF6A13; --yellow:#FFC21A; --red:#D7261E;
+  --reuse:#FF6A13; --reuse-ink:#B03E00; --recycle:#F5B400; --recycle-ink:#7E5600; --dispose:#D7261E; --dispose-ink:#B01F18;
   --warn:#C55400; --danger:#C8231B;
   --bar:#121110; --bar-ink:#FFFFFF;
   --shadow:0 1px 2px rgba(18,17,16,.06),0 6px 20px rgba(18,17,16,.07);
@@ -35,17 +35,17 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0E0D0C; --surface:#181715; --surface-2:#23211E; --ink:#F6F4EF; --muted:#A8A299; --line:#302D29;
-  --accent:#FFC83A; --accent-ink:#121110; --accent-soft:#3A2D06; --accent-text:#FFD15C;
-  --orange:#FF8A3D; --red:#FF5A4E;
-  --reuse:#FFC83A; --reuse-ink:#FFD15C; --recycle:#FF8A3D; --recycle-ink:#FFA36B; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
+  --accent:#FF7A2E; --accent-ink:#121110; --accent-soft:#3D1D08; --accent-text:#FF9A5C;
+  --orange:#FF7A2E; --yellow:#FFC83A; --red:#FF5A4E;
+  --reuse:#FF7A2E; --reuse-ink:#FF9A5C; --recycle:#FFC83A; --recycle-ink:#FFD15C; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
   --warn:#FF9A4D; --danger:#FF6A5E;
   --bar:#000000; --bar-ink:#FFFFFF;
   --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0E0D0C; --surface:#181715; --surface-2:#23211E; --ink:#F6F4EF; --muted:#A8A299; --line:#302D29;
-  --accent:#FFC83A; --accent-ink:#121110; --accent-soft:#3A2D06; --accent-text:#FFD15C;
-  --orange:#FF8A3D; --red:#FF5A4E;
-  --reuse:#FFC83A; --reuse-ink:#FFD15C; --recycle:#FF8A3D; --recycle-ink:#FFA36B; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
+  --accent:#FF7A2E; --accent-ink:#121110; --accent-soft:#3D1D08; --accent-text:#FF9A5C;
+  --orange:#FF7A2E; --yellow:#FFC83A; --red:#FF5A4E;
+  --reuse:#FF7A2E; --reuse-ink:#FF9A5C; --recycle:#FFC83A; --recycle-ink:#FFD15C; --dispose:#FF5A4E; --dispose-ink:#FF7C72;
   --warn:#FF9A4D; --danger:#FF6A5E;
   --bar:#000000; --bar-ink:#FFFFFF;
   --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.3); color-scheme:dark}
@@ -70,13 +70,13 @@ body.out .top,body.out .shell,body.out .tabbar{display:none}
 
 /* top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bar);color:var(--bar-ink)}
-.top::after{content:"";display:block;height:3px;background:linear-gradient(90deg,var(--accent),var(--orange) 55%,var(--red))}
+.top::after{content:"";display:block;height:3px;background:linear-gradient(90deg,var(--yellow),var(--orange) 28%,var(--orange) 74%,var(--red))}
 .top-in{display:flex;align-items:center;gap:10px;padding:9px 16px;max-width:1200px;margin:0 auto}
 .brand{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:800;font-size:1.15rem;letter-spacing:-.02em;min-width:0}
 .brand-mark{width:30px;height:30px;flex:none}
 .brand small{font-family:var(--f-body);font-weight:500;font-size:.75rem;color:color-mix(in oklab,var(--bar-ink) 60%,transparent);letter-spacing:0}
 .spacer{flex:1}
-.role-tag{background:var(--orange);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.role-tag{background:var(--yellow);color:#121110;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;white-space:nowrap}
 .iconbtn{position:relative;border:1px solid var(--line);background:var(--surface);width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none;color:var(--ink)}
 .iconbtn svg{width:19px;height:19px}
 .top .iconbtn{background:transparent;border-color:color-mix(in oklab,var(--bar-ink) 25%,transparent);color:var(--bar-ink)}
@@ -133,7 +133,7 @@ textarea{resize:vertical;min-height:70px}
 .pill.recycle{background:color-mix(in oklab,var(--recycle) 18%,transparent);color:var(--recycle-ink)}
 .pill.dispose{background:color-mix(in oklab,var(--dispose) 16%,transparent);color:var(--dispose-ink)}
 .pill.neutral{background:var(--surface-2);color:var(--muted)}
-.pill.warn{background:color-mix(in oklab,var(--orange) 18%,transparent);color:var(--recycle-ink)}
+.pill.warn{background:color-mix(in oklab,var(--red) 14%,transparent);color:var(--dispose-ink)}
 .pill.accent{background:var(--accent-soft);color:var(--accent-text)}
 .sample-tag{font-size:.7rem;font-weight:600;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:2px 7px}
 .page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -151,7 +151,7 @@ textarea{resize:vertical;min-height:70px}
 /* sign-in */
 .gate{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
 .gate-hero{background:var(--bar);color:var(--bar-ink);padding:36px 16px 76px;position:relative}
-.gate-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--accent),var(--orange) 55%,var(--red))}
+.gate-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--yellow),var(--orange) 28%,var(--orange) 74%,var(--red))}
 .gate-hero .in{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .gate-hero .brand{font-size:1.4rem}
 .gate-hero .brand-mark{width:40px;height:40px}
@@ -205,7 +205,7 @@ textarea{resize:vertical;min-height:70px}
 .prog-top b{font-size:.95rem}
 .prog-top .mono{font-weight:700;color:var(--accent-text)}
 .prog-bar{height:8px;background:var(--surface-2);border-radius:5px;overflow:hidden}
-.prog-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--orange) 70%,var(--red));border-radius:5px;transition:width .25s linear}
+.prog-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange) 55%,var(--red));border-radius:5px;transition:width .25s linear}
 .steps{list-style:none;margin:2px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted)}
 .steps li{display:flex;align-items:center;gap:8px}
 .steps li::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line);flex:none;box-sizing:border-box}
@@ -222,7 +222,7 @@ textarea{resize:vertical;min-height:70px}
 .stamp .ico svg{width:17px;height:17px;color:var(--surface)}
 .stamp.reuse{color:var(--reuse-ink)} .stamp.recycle{color:var(--recycle-ink)} .stamp.dispose{color:var(--dispose-ink)}
 .meter{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;width:110px}
-.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--orange));border-radius:4px}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),var(--orange));border-radius:4px}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .facts div{background:var(--surface);padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .facts b{font-family:var(--f-mono);font-size:.96rem;font-variant-numeric:tabular-nums}
@@ -300,12 +300,29 @@ table.t{width:100%;border-collapse:collapse;font-size:.88rem;min-width:600px}
 .rule.reuse .p{color:var(--reuse-ink)} .rule.recycle .p{color:var(--recycle-ink)} .rule.receive .p{color:var(--accent-text)}
 .show{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
-.ba{display:grid;grid-template-columns:1fr 1fr;height:120px}
+.ba{display:grid;grid-template-columns:1fr 1fr;height:150px}
 .ba div{display:flex;align-items:flex-end;padding:8px 10px;font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;position:relative;overflow:hidden}
 .ba .b{background:repeating-linear-gradient(45deg,var(--surface-2) 0 8px,color-mix(in oklab,var(--muted) 18%,var(--surface-2)) 8px 16px);color:var(--muted)}
 .ba .a{background:color-mix(in oklab,var(--accent) 30%,var(--surface));color:var(--accent-text)}
 .ba svg{position:absolute;inset:14px 14px 26px;width:calc(100% - 28px);height:calc(100% - 40px)}
 .proj .body{padding:14px;display:flex;flex-direction:column;gap:6px}
+.ba div > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .tag{position:relative;z-index:1;background:rgba(10,9,8,.6);color:#fff;padding:2px 7px;border-radius:5px}
+.vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
+label.btn{position:relative}
+input[type=file]{font-size:.85rem;color:var(--muted)}
+.mthumb{width:44px;height:44px;border-radius:9px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;flex:none}
+.mthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.mthumb .glyph{width:24px;height:24px}
+.pp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pp .slot{aspect-ratio:4/3;border-radius:10px;background:var(--surface-2);overflow:hidden;display:grid;place-items:center;position:relative}
+.pp .slot img{width:100%;height:100%;object-fit:cover;display:block}
+.kpi.money{background:var(--accent-soft);border-color:color-mix(in oklab,var(--orange) 45%,var(--line))}
+.kpi .sub{font-size:.76rem;color:var(--muted);line-height:1.35}
+.moneysplit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:18px;align-items:center}
+@media (max-width:700px){.moneysplit{grid-template-columns:minmax(0,1fr)}}
+.bigrm{font-family:var(--f-display);font-weight:800;font-size:clamp(1.9rem,5vw,2.6rem);letter-spacing:-.02em;color:var(--accent-text);font-variant-numeric:tabular-nums;line-height:1.05}
+.bigrm small{font-size:.5em;margin-right:4px}
 
 /* overlays */
 .scrim{position:fixed;inset:0;background:rgba(10,9,8,.5);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
@@ -391,7 +408,46 @@ const CAT = {
   kitchenware:{label:'Kitchenware',reuse:3,recycle:1.5,p:'M4 10h16v4a6 6 0 0 1-6 6h-4a6 6 0 0 1-6-6zM2 10h2M20 10h2M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2'},
   other:{label:'Other',reuse:2,recycle:0.5,p:'M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10'},
 };
+/* ---------- photos you add to the project ----------
+   Drop photos into images/market/ and images/showcase/ using these names (.jpg, .jpeg, .png or .webp).
+   Anything missing falls back to the drawn symbol. See images/README.txt. */
+const DEMO_IMG = {
+  'Rattan armchair':'images/market/rattan-armchair',
+  "Kids' bicycle, 16-inch":'images/market/kids-bicycle',
+  'Microwave oven, 20L':'images/market/microwave-oven',
+  'SPM reference books (set of 9)':'images/market/spm-books',
+  'Study desk with drawer':'images/market/study-desk',
+  'Wooden bookshelf, 4-tier':'images/market/wooden-bookshelf',
+  'Cracked plastic storage drawers':'images/market/plastic-drawers',
+  'Old CRT monitor':'images/market/crt-monitor',
+  'Office swivel chair':'images/market/office-chair',
+};
+const SHOW_IMG = { s1:'images/showcase/lakeside-gazebo', s2:'images/showcase/jogging-benches', s3:'images/showcase/planter-boxes' }; // + "-before" / "-after"
+const IMG_EXTS = ['jpg','jpeg','png','webp'];
+const imgFound = {};   // base path -> working URL, or null when no file exists
+function slotImg(base, alt, fallback){
+  if(!base || imgFound[base]===null) return fallback;
+  const src = imgFound[base] || base+'.'+IMG_EXTS[0];
+  return `<img src="${src}" alt="${esc(alt)}" data-base="${base}" onload="wlImgOk(this)" onerror="wlImgErr(this)"><span class="fb" hidden>${fallback}</span>`;
+}
+window.wlImgOk = el => { imgFound[el.dataset.base] = el.getAttribute('src'); };
+window.wlImgErr = el => {
+  const base = el.dataset.base, ext = el.getAttribute('src').split('.').pop();
+  const next = IMG_EXTS[IMG_EXTS.indexOf(ext)+1];
+  if(next){ el.src = base+'.'+next; return; }
+  imgFound[base] = null; el.hidden = true; const fb = el.nextElementSibling; if(fb) fb.hidden = false;
+};
+async function fileToDataUrl(file, max=640, q=0.78){
+  const url = URL.createObjectURL(file);
+  try{
+    const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=url; });
+    const k = Math.min(1, max/Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width=Math.round(img.naturalWidth*k); c.height=Math.round(img.naturalHeight*k);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height); return c.toDataURL('image/jpeg', q);
+  } finally { URL.revokeObjectURL(url); }
+}
 const glyph = c => `<svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="${(CAT[c]||CAT.other).p}"/></svg>`;
+const itemThumb = (l, alt='') => l.photo ? `<img src="${l.photo}" alt="${esc(alt)}">` : slotImg(l.img || DEMO_IMG[l.title], alt, glyph(l.category));
 const ZONES = ['Elmina Green 1','Elmina Green 2','Elmina West','Elmina East','Elmina Lakeside'];
 const PTS = {reuse:50, receive:10, recycle:20};
 const DAY = 864e5, LIST_DAYS = 7, WARN_DAYS = 2;
@@ -461,7 +517,7 @@ function seed(){
       {userId:'me',pts:50,reason:'Reuse handover: dining chairs',at:t-6*DAY},
       {userId:'me',pts:10,reason:'Received: shoe rack',at:t-4*DAY},
     ],
-    mine:{kg:31,items:3,co2:58},
+    mine:{kg:31,items:3,co2:58,savedRm:85,gaveRm:260}, disposalRate:150,
     wishlist:[
       {id:uid('w'),userId:'me',text:'Baby high chair',category:'furniture',at:t-3*DAY},
       {id:uid('w'),userId:'u4',text:'Study desk',category:'furniture',at:t-6*DAY},
@@ -487,9 +543,11 @@ function seed(){
 }
 function load(){ try{ const j = JSON.parse(localStorage.getItem(KEY)); if(j && j.v===1) return j; }catch(e){} return seed(); }
 function save(){ try{ const c = structuredClone(S); localStorage.setItem(KEY, JSON.stringify(c)); }catch(e){ try{ // drop photos if over quota
-  const c = structuredClone(S); c.listings.forEach(l=>{ if(l.photo && l.status!=='open') l.photo=null; }); localStorage.setItem(KEY, JSON.stringify(c)); }catch(_){} } }
+  const c = structuredClone(S); c.listings.forEach(l=>{ if(l.photo && l.status!=='open') l.photo=null; }); localStorage.setItem(KEY, JSON.stringify(c)); }catch(_){ toast('Phone storage is full. Remove some photos to keep saving.'); } } }
 S = load();
 if(S.view==='snap') S.view='home';
+if(S.mine.savedRm==null){ S.mine.savedRm=85; S.mine.gaveRm=260; }
+if(S.disposalRate==null) S.disposalRate=150;
 
 /* ---------- transient UI state ---------- */
 /* ---------- sign-in ---------- */
@@ -804,12 +862,12 @@ function vHome(){
   </section>
   <section class="stack">
     <div class="sec-head"><h2>Your impact</h2><button class="linkbtn" data-act="go" data-v="impact">Details</button></div>
-    <div class="mini"><div><span class="eyebrow">Diverted</span><b>${fmt(S.mine.kg,0)} kg</b></div><div><span class="eyebrow">Reused</span><b>${fmt(S.mine.items)}</b></div><div><span class="eyebrow">Points</span><b>${fmt(S.points.me)}</b></div></div>
+    <div class="mini"><div><span class="eyebrow">Diverted</span><b>${fmt(S.mine.kg,0)} kg</b></div><div><span class="eyebrow">Reused</span><b>${fmt(S.mine.items)}</b></div><div><span class="eyebrow">Saved</span><b>RM ${fmt(S.mine.savedRm+S.mine.gaveRm)}</b></div></div>
   </section>`;
 }
 function irow(l){
   const d = (l.expiresAt-now())/DAY;
-  return `<button class="irow" data-act="go" data-v="market"><span class="th">${l.photo?`<img src="${l.photo}" alt="">`:glyph(l.category)}</span>
+  return `<button class="irow" data-act="go" data-v="market"><span class="th">${itemThumb(l)}</span>
     <span class="tx"><b>${esc(l.title)}</b><span class="small muted">${l.mode==='swap'?'Swap':'Free'} · ${esc(l.zone)}</span></span>
     <span class="clock ${d<=WARN_DAYS?'low':''}">${d>=1?Math.floor(d)+'d left':Math.max(0,Math.floor(d*24))+'h left'}</span></button>`;
 }
@@ -942,7 +1000,7 @@ function itemCard(l){
   else if(l.status==='reserved') act = mine ? `<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} Show QR</button>` : (l.claimerId==='me'?`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Scan at pickup</button>`:`<span class="pill neutral">Reserved</span>`);
   const status = {open:'',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">To recycling</span>',scheduled:'<span class="pill recycle">Pickup scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[l.status]||'';
   return `<article class="item">
-    <div class="thumb">${l.photo?`<img src="${l.photo}" alt="${esc(l.title)}">`:glyph(l.category)}
+    <div class="thumb">${itemThumb(l, l.title)}
       <div class="badges"><span class="pill ${l.mode==='swap'?'accent':'reuse'}">${l.mode==='swap'?'Swap':'Free'}</span>${status}</div></div>
     <div class="body"><h3>${esc(l.title)}</h3>
       <p class="small muted">${esc(l.description)}</p>
@@ -982,22 +1040,23 @@ function vImpact(){
   const myLedger = S.ledger.filter(x=>x.userId==='me').slice(0,8);
   return `<div class="page-head"><div><span class="eyebrow">Impact</span><h1>What you've kept out of landfill</h1></div></div>
   <div class="kpis">
+    <div class="kpi money"><span class="eyebrow">Money saved</span><span class="v"><small style="margin:0 3px 0 0">RM</small>${fmt(me.savedRm+me.gaveRm)}</span>
+      <span class="sub">RM ${fmt(me.savedRm)} on items you took · RM ${fmt(me.gaveRm)} for neighbours</span></div>
     <div class="kpi"><span class="eyebrow">Diverted by you</span><span class="v">${fmt(me.kg,me.kg<10?1:0)}<small>kg</small></span></div>
     <div class="kpi"><span class="eyebrow">Items reused</span><span class="v">${fmt(me.items)}</span></div>
     <div class="kpi"><span class="eyebrow">CO₂ avoided</span><span class="v">${fmt(me.co2,0)}<small>kg</small></span></div>
-    <div class="kpi"><span class="eyebrow">Green points</span><span class="v">${fmt(S.points.me)}</span></div>
   </div>
   <div class="two">
     <div class="card stack"><div class="row" style="justify-content:space-between"><h2>Elmina, phase by phase</h2><span class="sample-tag">includes sample data</span></div>
       <p class="small muted">Total kg kept out of landfill since launch. Your phase is highlighted.</p>
       <div class="stack">${e.byZone.slice().sort((a,b)=>(b.reuseKg+b.recycleKg)-(a.reuseKg+a.recycleKg)).map(z=>{const t=z.reuseKg+z.recycleKg;return `<div class="hbar ${z.zone===user('me').zone?'me':''}"><span class="lbl">${esc(z.zone)}</span><div class="track"><i style="width:${z.reuseKg/maxZ*100}%;background:var(--reuse)"></i><i style="width:${z.recycleKg/maxZ*100}%;background:var(--recycle)"></i></div><span class="num">${kg(t)}</span></div>`}).join('')}</div>
       <div class="legend"><span><i style="background:var(--reuse)"></i>Reused</span><span><i style="background:var(--recycle)"></i>Recycled</span></div>
-      <p class="small">The whole township has diverted <b>${kg(e.total.kg)}</b> and avoided <b>${kg(e.total.co2)}</b> of CO₂.</p></div>
+      <p class="small">The whole township has diverted <b>${kg(e.total.kg)}</b>, saved residents <b>RM ${fmt(e.total.valueRm)}</b> and avoided <b>${kg(e.total.co2)}</b> of CO₂.</p></div>
     <div class="card stack"><h2>Your activity</h2>
       <div class="ledger">${myLedger.map(x=>`<div><span>${esc(x.reason)}<br><span class="small muted">${new Date(x.at).toLocaleDateString('en-MY',{day:'numeric',month:'short'})}</span></span><span class="${x.pts>0?'plus':'minus'}">${x.pts>0?'+':''}${x.pts}</span></div>`).join('')}</div></div>
   </div>
   <section class="stack"><div class="page-head"><div><span class="eyebrow">SDP Showcase</span><h2>Construction waste, given a second life</h2></div></div>
-    <div class="show">${S.showcase.map(projCard).join('')}</div></section>`;
+    <div class="show">${S.showcase.map(p=>projCard(p)).join('')}</div></section>`;
 }
 function shapeSvg(s){
   const st='style="fill:none;stroke:currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"';
@@ -1006,11 +1065,28 @@ function shapeSvg(s){
   if(s==='planter') return `<svg viewBox="0 0 100 60" ${st}><path d="M12 34h76l-6 22H18zM30 34c0-12 6-20 6-26M36 20c6-2 10 0 12 6M50 34c0-10 4-16 10-22M60 20c6 0 8 4 8 8M70 34c-2-8 2-12 6-14"/></svg>`;
   return `<svg viewBox="0 0 100 60" ${st}><path d="M20 20h60v36H20zM20 20l30-14 30 14"/></svg>`;
 }
-function projCard(p){
-  return `<article class="proj"><div class="ba"><div class="b">Before · scrap</div><div class="a">${shapeSvg(p.shape)}After</div></div>
+function projImg(p, side, fallback=''){
+  if(p[side]) return `<img src="${p[side]}" alt="">`;
+  return SHOW_IMG[p.id] ? slotImg(SHOW_IMG[p.id]+'-'+side, '', fallback) : fallback;
+}
+function projCard(p, admin=false){
+  return `<article class="proj"><div class="ba">
+      <div class="b">${projImg(p,'before')}<span class="tag">Before</span></div>
+      <div class="a">${projImg(p,'after',shapeSvg(p.shape))}<span class="tag">After</span></div></div>
     <div class="body"><h3>${esc(p.title)}</h3><p class="small muted">${esc(p.note)}</p>
     <div class="row small"><span class="pill accent">${kg(p.kg)} reused</span><span class="muted">${esc(p.material)}</span></div>
-    <p class="small muted">${esc(p.location)} · ${esc(p.date)}</p></div></article>`;
+    <p class="small muted">${esc(p.location)} · ${esc(p.date)}</p>
+    ${admin?`<div><button class="btn sm" data-act="show-photos" data-v="${p.id}">Before / after photos</button></div>`:''}</div></article>`;
+}
+function showPhotos(id){
+  const p = S.showcase.find(x=>x.id===id); if(!p) return;
+  const slot = side => `<div class="stack" style="gap:6px"><span class="eyebrow">${side==='before'?'Before':'After'}</span>
+      <div class="slot">${projImg(p,side,'<span class="small muted">No photo yet</span>')}</div>
+      <label class="btn sm">${p[side]?'Change':'Add'} photo<input type="file" accept="image/*" class="vh" data-show-photo="${id}:${side}"></label></div>`;
+  sheet(`<div class="sheet-head"><div><span class="eyebrow">Showcase photos</span><h2>${esc(p.title)}</h2></div><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    <div class="pp">${slot('before')}${slot('after')}</div>
+    ${(p.before||p.after)?`<div><button class="btn sm ghost" data-act="clear-show-photos" data-v="${id}">Remove photos added here</button></div>`:''}
+    <p class="small muted">Photos added here are saved on this phone. To show them on every phone, put the files in the images/showcase folder of the project (see images/README.txt).</p>`);
 }
 
 /* ---------- resident: rewards ---------- */
@@ -1032,7 +1108,8 @@ function vRewards(){
 /* ---------- admin: ESG ---------- */
 function vESG(){
   const e = esg(), bm = e.byMonth, cur = bm[5], prev = bm[4];
-  const d = (a,b)=>{ if(!b) return ''; const p=(a-b)/b*100; return `<span class="delta ${p<0?'neg':''}">${p>=0?'▲':'▼'} ${fmt(Math.abs(p),0)}% vs ${MON[(prev.mk)%12]}</span>`; };
+  const pp = bm[3];  // compare the last two full months, since this month has only just started
+  const d = (a,b)=>{ if(!b) return ''; const p=(a-b)/b*100; return `<span class="delta ${p<0?'neg':''}">${p>=0?'▲':'▼'} ${fmt(Math.abs(p),0)}% in ${MON[prev.mk%12]}</span>`; };
   // chart
   const W=640,H=260,pl=48,pr=12,pt=14,pb=30, cw=(W-pl-pr)/bm.length;
   const max = Math.max(...bm.map(m=>m.reuseKg+m.recycleKg)); const step = niceStep(max/4); const top = Math.ceil(max/step)*step;
@@ -1047,13 +1124,16 @@ function vESG(){
   const catTot = {}; S.listings.filter(l=>l.status!=='removed').forEach(l=>{ catTot[l.category]=(catTot[l.category]||0)+l.weightKg; });
   S.weighins.forEach(w=>{ catTot[w.material]=(catTot[w.material]||0)+w.kg; });
   const cats = Object.entries(catTot).sort((a,b)=>b[1]-a[1]).slice(0,7); const cmax = Math.max(1,...cats.map(c=>c[1]));
+  // money saved = residents (second-hand value of items reused instead of bought new) + SDP (disposal cost avoided)
+  const rate = S.disposalRate||0, sdpRm = Math.round(e.total.kg/1000*rate), resRm = e.total.valueRm, totRm = resRm + sdpRm;
+  const monthRm = m => m.valueRm + (m.reuseKg+m.recycleKg)/1000*rate, mmax = Math.max(1,resRm,sdpRm);
   return `<div class="page-head"><div><span class="eyebrow">SDP Admin · ESG Dashboard</span><h1>Elmina circularity report</h1>
     <p class="muted" style="margin-top:6px">Since launch, all phases. Figures combine resident activity in WasteLoop with collection-point weigh-ins.</p></div><span class="sample-tag">includes sample history</span></div>
   <div class="kpis">
-    <div class="kpi"><span class="eyebrow">Diverted from landfill</span><span class="v">${fmt(e.total.kg/1000,2)}<small>tonnes</small></span>${d(cur.reuseKg+cur.recycleKg,prev.reuseKg+prev.recycleKg)}</div>
-    <div class="kpi"><span class="eyebrow">Items reused</span><span class="v">${fmt(e.total.items)}</span>${d(cur.items,prev.items)}</div>
-    <div class="kpi"><span class="eyebrow">Saved by residents</span><span class="v"><small style="margin:0 3px 0 0">RM</small>${fmt(e.total.valueRm)}</span>${d(cur.valueRm,prev.valueRm)}</div>
-    <div class="kpi"><span class="eyebrow">CO₂e avoided</span><span class="v">${fmt(e.total.co2/1000,1)}<small>tonnes</small></span>${d(cur.co2,prev.co2)}</div>
+    <div class="kpi"><span class="eyebrow">Diverted from landfill</span><span class="v">${fmt(e.total.kg/1000,2)}<small>tonnes</small></span>${d(prev.reuseKg+prev.recycleKg,pp.reuseKg+pp.recycleKg)}</div>
+    <div class="kpi"><span class="eyebrow">Items reused</span><span class="v">${fmt(e.total.items)}</span>${d(prev.items,pp.items)}</div>
+    <div class="kpi money"><span class="eyebrow">Total money saved</span><span class="v"><small style="margin:0 3px 0 0">RM</small>${fmt(totRm)}</span><span class="sub">Residents RM ${fmt(resRm)} · SDP RM ${fmt(sdpRm)}</span></div>
+    <div class="kpi"><span class="eyebrow">CO₂e avoided</span><span class="v">${fmt(e.total.co2/1000,1)}<small>tonnes</small></span>${d(prev.co2,pp.co2)}</div>
   </div>
   <div class="two">
     <div class="card stack"><div class="row" style="justify-content:space-between"><h2>Kg diverted per month</h2>
@@ -1069,6 +1149,17 @@ function vESG(){
       ${S.weighins.length?`<div class="ledger">${S.weighins.slice(0,4).map(w=>`<div><span>${esc(w.zone)} · ${esc(CAT[w.material]?.label||w.material)}</span><span class="mono">${fmt(w.kg,1)} kg</span></div>`).join('')}</div>`:''}
     </div>
   </div>
+  <div class="card stack"><h2>Money saved</h2>
+    <div class="moneysplit">
+      <div><div class="bigrm"><small>RM</small>${fmt(totRm)}</div><p class="small muted">Since launch, all phases</p></div>
+      <div class="stack">
+        <div class="hbar"><span class="lbl">Residents</span><div class="track"><i style="width:${resRm/mmax*100}%;background:var(--orange)"></i></div><span class="num">RM ${fmt(resRm)}</span></div>
+        <div class="hbar"><span class="lbl">SDP disposal</span><div class="track"><i style="width:${sdpRm/mmax*100}%;background:var(--yellow)"></i></div><span class="num">RM ${fmt(sdpRm)}</span></div>
+      </div>
+    </div>
+    <p class="small muted"><b>Residents:</b> second-hand value of items reused instead of bought new. <b>SDP disposal:</b> ${fmt(e.total.kg/1000,2)} tonnes kept out of landfill × the disposal cost per tonne below. RM ${fmt(rate)} is a placeholder; enter SDP's real rate.</p>
+    <form class="row" data-form="rate"><label class="f" style="flex:1;min-width:180px">Disposal cost per tonne (RM)<input type="number" id="rate" min="0" step="1" value="${rate}"></label><button class="btn sm" style="align-self:flex-end">Update</button></form>
+  </div>
   <div class="card stack"><h2>What residents are giving away</h2><p class="small muted">Weight of items currently listed or processed in the app, by category.</p>
     ${cats.map(([c,v])=>`<div class="hbar"><span class="lbl">${esc(CAT[c]?.label||c)}</span><div class="track"><i style="width:${v/cmax*100}%;background:var(--accent)"></i></div><span class="num">${fmt(v,0)} kg</span></div>`).join('')}
     <p class="small muted">CO₂e uses per-category estimates (for example furniture reuse 1.8 kg CO₂e per kg, e-waste reuse 20). Replace these with SDP's audited factors before reporting.</p></div>`;
@@ -1077,7 +1168,7 @@ function niceStep(x){ const p=Math.pow(10,Math.floor(Math.log10(x||1))); const n
 
 /* ---------- admin: heatmap ---------- */
 // yellow (quiet) to orange to red (busiest)
-const heatStyle = p => `background:color-mix(in oklab,color-mix(in oklab,var(--red) ${Math.round(p*100)}%,var(--accent)) ${Math.round(14+p*86)}%,var(--surface-2));color:${p>0.7?'#fff':'var(--ink)'}`;
+const heatStyle = p => `background:color-mix(in oklab,color-mix(in oklab,var(--red) ${Math.round(p*100)}%,var(--yellow)) ${Math.round(14+p*86)}%,var(--surface-2));color:${p>0.7?'#fff':'var(--ink)'}`;
 function vHeat(){
   const ev = liveStats();
   const counts = ZONES.map(z=>{ const row=[]; for(let w=7;w>=0;w--){ let c = w===0?0:(S.weekly.find(x=>x.zone===z&&x.week===w)?.count||0);
@@ -1128,11 +1219,13 @@ function vManage(){
   const L = S.listings.slice().sort((a,b)=>b.createdAt-a.createdAt);
   const issued = S.ledger.filter(x=>x.pts>0).reduce((a,b)=>a+b.pts,0), redeemed = -S.ledger.filter(x=>x.pts<0).reduce((a,b)=>a+b.pts,0);
   const st = s => ({open:'<span class="pill reuse">Open</span>',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">Queue</span>',scheduled:'<span class="pill recycle">Scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[s]);
-  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Listings & points</span><h1>Marketplace oversight</h1></div></div>
-  <div class="card tablewrap"><table class="t"><thead><tr><th>Listing</th><th>Owner</th><th>Route</th><th>Status</th><th>Expires</th><th></th></tr></thead><tbody>
-    ${L.map(l=>`<tr><td><b>${esc(l.title)}</b><div class="small muted">${esc(CAT[l.category].label)} · ${l.mode==='swap'?'Swap':'Free'}</div></td><td>${esc(user(l.ownerId).name)}<div class="small muted">${esc(l.zone)}</div></td>
+  return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Listings & points</span><h1>Marketplace oversight</h1>
+    <p class="muted" style="margin-top:6px">Use <b>Add</b> under Photo to put a real picture on any listing (saved on this phone). For photos on every phone, see images/README.txt.</p></div></div>
+  <div class="card tablewrap"><table class="t"><thead><tr><th>Listing</th><th>Owner</th><th>Route</th><th>Status</th><th>Expires</th><th>Photo</th><th></th></tr></thead><tbody>
+    ${L.map(l=>`<tr><td><div class="row" style="flex-wrap:nowrap;gap:10px"><span class="mthumb">${itemThumb(l)}</span><div><b>${esc(l.title)}</b><div class="small muted">${esc(CAT[l.category].label)} · ${l.mode==='swap'?'Swap':'Free'}</div></div></div></td><td>${esc(user(l.ownerId).name)}<div class="small muted">${esc(l.zone)}</div></td>
       <td><span class="pill ${l.route}">${routeName(l.route)}</span></td><td>${st(l.status)}</td>
       <td class="mono small">${l.status==='open'?new Date(l.expiresAt).toLocaleDateString('en-MY',{day:'numeric',month:'short'}):'—'}</td>
+      <td><label class="btn sm">${l.photo?'Change':'Add'}<input type="file" accept="image/*" class="vh" data-photo-for="${l.id}"></label></td>
       <td>${l.status==='open'?`<button class="btn sm ghost" data-act="remove" data-v="${l.id}">Remove</button>`:''}</td></tr>`).join('')}
   </tbody></table></div>
   <div class="two">
@@ -1147,7 +1240,7 @@ function vShowAdmin(){
   return `<div class="page-head"><div><span class="eyebrow">SDP Admin · Showcase</span><h1>Post a reuse project</h1>
     <p class="muted" style="margin-top:6px">Residents see these on their Impact page.</p></div></div>
   <div class="two">
-    <div class="show" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">${S.showcase.map(projCard).join('')}</div>
+    <div class="show" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">${S.showcase.map(p=>projCard(p,true)).join('')}</div>
     <form class="card stack" data-form="show" style="align-self:start"><h3>New project</h3>
       <label class="f">Project name<input type="text" id="sp_t" placeholder="e.g. Bus-stop shelter"></label>
       <label class="f">Construction material reused<input type="text" id="sp_m" placeholder="e.g. Steel hoarding panels"></label>
@@ -1155,6 +1248,8 @@ function vShowAdmin(){
       <label class="f">Location<input type="text" id="sp_l" placeholder="e.g. Elmina West entrance"></label>
       <label class="f">Type<select id="sp_s"><option value="gazebo">Shelter / gazebo</option><option value="bench">Seating</option><option value="planter">Garden / planter</option><option value="other">Other</option></select></label>
       <label class="f">Short note<textarea id="sp_n"></textarea></label>
+      <label class="f">Before photo (optional)<input type="file" id="sp_bf" accept="image/*"></label>
+      <label class="f">After photo (optional)<input type="file" id="sp_af" accept="image/*"></label>
       <button class="btn primary">Publish to residents</button></form>
   </div>`;
 }
@@ -1216,6 +1311,8 @@ function confirmPickup(l){
   award(l.claimerId,PTS.receive,`Received: ${l.title}`);
   const co2 = co2For(l.category,'reuse',l.weightKg);
   if(l.ownerId==='me'||l.claimerId==='me'){ S.mine.kg+=l.weightKg; S.mine.co2+=co2; if(l.ownerId==='me') S.mine.items++; }
+  if(l.claimerId==='me') S.mine.savedRm += l.valueRm||0;   // you took it instead of buying new
+  if(l.ownerId==='me') S.mine.gaveRm += l.valueRm||0;      // your neighbour didn't have to buy it
   if(l.ownerId==='me') notify('me',`${user(l.claimerId).name} scanned your QR. +${PTS.reuse} points for “${l.title}”.`);
   else notify(l.ownerId,`You scanned the handover for “${l.title}”.`);
 }
@@ -1223,7 +1320,7 @@ function confirmPickup(l){
 /* ---------- events ---------- */
 // Ignore taps that land within a moment of scrolling (a swipe on the phone shouldn't press buttons).
 let lastScroll = 0;
-addEventListener('scroll', ()=>{ lastScroll = Date.now(); }, {passive:true, capture:true});
+// Only finger swipes count, not scrolls the app makes itself (like jumping to the top on a new tab).
 addEventListener('touchmove', ()=>{ lastScroll = Date.now(); }, {passive:true});
 document.addEventListener('click', ev=>{
   const t = ev.target.closest('[data-act]'); if(!t) return;
@@ -1270,6 +1367,9 @@ function doAct(a, v, t){
         const nb=S.users.filter(u=>u.id!=='me')[Math.floor(Math.random()*5)];
         l.status='reserved'; l.claimerId=nb.id; notify('me',`${nb.name} from ${nb.zone} claimed your “${l.title}”. Show your QR at pickup.`); save(); render(); showQR(l.id); }); break; }
     case 'sim-scan': { const l=L(v); if(!l) break; confirmPickup(l); save(); closeSheet(); render(); toast(`Handover confirmed. +${PTS.reuse} points`); break; }
+    case 'show-photos': showPhotos(v); break;
+    case 'clear-show-photos': { const p=S.showcase.find(x=>x.id===v); if(!p) break;
+      confirmSheet({title:`Remove photos from “${p.title}”?`, body:'Only photos added on this phone are removed. Files in the images folder stay.', ok:'Remove', tone:'danger'}, ()=>{ delete p.before; delete p.after; save(); render(); toast('Photos removed'); }); break; }
     case 'unwish': S.wishlist=S.wishlist.filter(w=>w.id!==v); save(); render(); break;
     case 'redeem': { const r=S.rewards.find(x=>x.id===v); if(!r||S.points.me<r.cost) break;
       confirmSheet({title:`Redeem ${r.name}?`, body:`${fmt(r.cost)} points will be used. You'll have ${fmt(S.points.me-r.cost)} left.`, ok:'Redeem'}, ()=>{
@@ -1286,6 +1386,15 @@ function doAct(a, v, t){
   }
 }
 document.addEventListener('change', async ev=>{
+  const pf = ev.target.dataset?.photoFor, sp = ev.target.dataset?.showPhoto;
+  if(pf || sp){ const f = ev.target.files?.[0]; if(!f) return;
+    try{
+      const url = await fileToDataUrl(f, sp?800:560);
+      if(pf){ const l=S.listings.find(x=>x.id===pf); if(l){ l.photo=url; save(); render(); toast('Photo added'); } }
+      else { const [id,side]=sp.split(':'); const p=S.showcase.find(x=>x.id===id); if(p){ p[side]=url; save(); render(); showPhotos(id); toast('Photo added'); } }
+    }catch(e){ toast('That file could not be opened as an image'); }
+    return;
+  }
   if(ev.target.id==='photo'){ const f=ev.target.files?.[0]; if(!f) return;
     try{ const {blob,thumb}=await toBlobs(f); U.snap.blob=blob; U.snap.photo=thumb; U.snap.desc=document.getElementById('desc')?.value||U.snap.desc; if(U.snap.stage==='error') U.snap.stage='idle'; render(); }
     catch(e){ toast('That file could not be opened as an image'); }
@@ -1312,14 +1421,18 @@ document.addEventListener('submit', ev=>{
   if(k==='sched'){ const id=f.dataset.v, d=val('d_'+id); const l=S.listings.find(x=>x.id===id); if(!l||!d) return;
     confirmSheet({title:`Schedule pickup on ${d}?`, body:`${user(l.ownerId).name} will be told to leave “${l.title}” at their bin area that morning.`, ok:'Schedule'}, ()=>{
       if(l.status!=='routed') return; l.status='scheduled'; l.pickupDate=d; notify(l.ownerId,`SDP will collect “${l.title}” on ${d}. Leave it at your bin area that morning.`); save(); render(); toast('Pickup scheduled'); }); }
+  if(k==='rate'){ const r=Number(val('rate')); if(!(r>=0)){ toast('Enter a number of ringgit'); return; } S.disposalRate=Math.round(r); save(); render(); toast(`Disposal cost set to RM ${fmt(r)} per tonne`); return; }
   if(k==='code'){ const l=S.listings.find(x=>x.id===f.dataset.v); const c=val('codeIn').toUpperCase();
     if(!l) return; if(c!==l.code){ toast('That code does not match. Check the owner\'s screen.'); return; }
     confirmPickup(l); save(); closeSheet(); render(); toast(`Pickup confirmed. +${PTS.receive} points, and ${user(l.ownerId).name} got +${PTS.reuse}`); }
   if(k==='show'){ const p={title:val('sp_t'),material:val('sp_m'),kg:Number(val('sp_k')),location:val('sp_l'),shape:val('sp_s'),note:val('sp_n')};
     if(!p.title||!(p.kg>0)){ toast('Add a name and the weight reused'); return; }
+    const bf=document.getElementById('sp_bf')?.files?.[0], af=document.getElementById('sp_af')?.files?.[0];
+    (async()=>{ try{ p.before = bf ? await fileToDataUrl(bf,800) : null; p.after = af ? await fileToDataUrl(af,800) : null; }
+      catch(e){ toast('A photo could not be opened. Try a JPG or PNG.'); return; }
     confirmSheet({title:`Publish “${p.title}” to residents?`, body:'Every resident gets a notification and sees it on their Impact page.', ok:'Publish'}, ()=>{
-      S.showcase.unshift({id:uid('s'),title:p.title,material:p.material||'Construction surplus',kg:p.kg,location:p.location||'Elmina',date:new Date(now()).toISOString().slice(0,7),shape:p.shape,note:p.note});
-      S.users.forEach(u=>notify(u.id,`New SDP Showcase project: ${p.title}.`)); save(); render(); toast('Published to residents'); }); }
+      S.showcase.unshift({id:uid('s'),title:p.title,material:p.material||'Construction surplus',kg:p.kg,location:p.location||'Elmina',date:new Date(now()).toISOString().slice(0,7),shape:p.shape,note:p.note,before:p.before,after:p.after});
+      S.users.forEach(u=>notify(u.id,`New SDP Showcase project: ${p.title}.`)); save(); render(); toast('Published to residents'); }); })(); }
 });
 function keepEdits(){ const sn=U.snap; const lt=document.getElementById('lt'), ld=document.getElementById('ld'), sf=document.getElementById('sf');
   if(lt) sn.title=lt.value; if(ld) sn.descEdit=ld.value; if(sf) sn.swapFor=sf.value; }

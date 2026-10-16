@@ -87,6 +87,18 @@ Zone must be one of: Elmina Green 1, Elmina Green 2, Elmina West, Elmina East, E
 
 Important actions (claim, redeem, post, send to recycling, remove listing, schedule pickup, mark collected, weigh-in, publish showcase, sign out, reset) open a confirmation sheet first. The Confirm button stays inactive for a moment so the same swipe can't press it, and taps that land right after scrolling are ignored.
 
+## Adding real photos
+
+Demo marketplace items and SDP Showcase projects show a drawn symbol until you add a photo. Two ways to add one:
+
+1. **Every phone sees it:** put photo files in `images/market/` and `images/showcase/` in your GitHub repo, named as listed in `images/README.txt` (for example `images/market/rattan-armchair.jpg` or `images/showcase/lakeside-gazebo-after.jpg`). JPG, PNG and WebP all work. Vercel updates the app in about a minute.
+2. **This phone only (quick demo setup):** sign in as SDP staff. Use **Add** under Photo on the Listings page, or **Before / after photos** on a Showcase project. New Showcase projects can include before and after photos when you publish them.
+
+## Money saved (RM)
+
+- **Resident Impact page:** "Money saved" adds up the second-hand value of items the resident took instead of buying new, plus the value of items they gave to neighbours. The Home screen shows the same total.
+- **SDP ESG dashboard:** "Total money saved" = residents' savings + SDP's disposal cost avoided (tonnes kept out of landfill × disposal cost per tonne). The cost per tonne starts at a **placeholder RM 150**. Set SDP's real rate in the **Money saved** card on the dashboard.
+
 ## If something goes wrong
 
 | What you see | Fix |

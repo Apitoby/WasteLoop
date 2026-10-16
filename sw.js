@@ -1,6 +1,6 @@
 // Offline support: the app shell loads without a connection.
 // AI calls (/api/*) always go to the network.
-const CACHE = 'wasteloop-v4';
+const CACHE = 'wasteloop-v5';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
@@ -16,6 +16,12 @@ self.addEventListener('fetch', e => {
   if (e.request.mode === 'navigate') {
     e.respondWith(fetch(e.request).then(r => { const c = r.clone(); caches.open(CACHE).then(x => x.put('./index.html', c)); return r; })
       .catch(() => caches.match('./index.html')));
+    return;
+  }
+  // photos in /images/: network first, so newly uploaded photos show up straight away
+  if (url.pathname.includes('/images/')) {
+    e.respondWith(fetch(e.request).then(r => { if (r.ok) { const c = r.clone(); caches.open(CACHE).then(x => x.put(e.request, c)); } return r; })
+      .catch(() => caches.match(e.request).then(hit => hit || Response.error())));
     return;
   }
   e.respondWith(caches.match(e.request).then(hit => hit || fetch(e.request).then(r => {
