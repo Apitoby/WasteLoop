@@ -94,6 +94,13 @@ Demo marketplace items and SDP Showcase projects show a drawn symbol until you a
 1. **Every phone sees it:** put photo files in `images/market/` and `images/showcase/` in your GitHub repo, named as listed in `images/README.txt` (for example `images/market/rattan-armchair.jpg` or `images/showcase/lakeside-gazebo-after.jpg`). JPG, PNG and WebP all work. Vercel updates the app in about a minute.
 2. **This phone only (quick demo setup):** sign in as SDP staff. Use **Add** under Photo on the Listings page, or **Before / after photos** on a Showcase project. New Showcase projects can include before and after photos when you publish them.
 
+## Other features
+
+- **Tap a photo to inspect it.** Item and Showcase photos show in full inside their box (nothing cropped). Tapping one opens it full screen with its name.
+- **List your item** lives in Market (and the "List your item" button on Home). Snap or describe the item, tap **Check with AI**, review, then post or send to recycling.
+- **Notifications open the right page.** For example, a claim on your item opens My listings, and a wishlist match opens the marketplace.
+- **Light mode by default.** Change it under the initials button → Settings → Theme (Light, Dark or System). The choice is remembered on that phone.
+
 ## Money saved (RM)
 
 - **Resident Impact page:** "Money saved" adds up the second-hand value of items the resident took instead of buying new, plus the value of items they gave to neighbours. The Home screen shows the same total.

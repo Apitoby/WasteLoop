@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>WasteLoop</title>
+<script>/* theme: light by default; the user can pick Light, Dark or System in Account & settings */
+try{ var t = localStorage.getItem('wl-theme') || 'light'; if(t !== 'system') document.documentElement.setAttribute('data-theme', t); }
+catch(e){ document.documentElement.setAttribute('data-theme','light'); }</script>
 <meta name="description" content="Snap unwanted items; AI sorts them into reuse, recycle or dispose for your township.">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#121110">
@@ -167,6 +170,27 @@ textarea{resize:vertical;min-height:70px}
 .hello{display:flex;flex-direction:column;gap:3px}
 .install{display:flex;gap:10px;align-items:center;padding:11px 13px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:.9rem}
 .install svg{width:20px;height:20px;flex:none;color:var(--accent-text)}
+.listgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:700px){.listgrid{grid-template-columns:minmax(0,1fr)}}
+.picker{position:relative;aspect-ratio:4/3;border-radius:16px;border:2px dashed color-mix(in oklab,var(--orange) 55%,var(--line));background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:16px;cursor:pointer;overflow:hidden;max-width:100%}
+.picker.over{border-color:var(--orange);background:var(--accent-soft)}
+.picker input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.picker .cam{width:60px;height:60px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center}
+.picker .cam svg{width:28px;height:28px}
+.picker img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:var(--surface-2)}
+.picker .change{position:absolute;left:10px;bottom:10px;z-index:1;background:rgba(10,9,8,.65);color:#fff;font-size:.8rem;font-weight:700;padding:5px 10px;border-radius:999px;pointer-events:none}
+.howto{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;counter-reset:st}
+.howto div{display:flex;gap:8px;align-items:flex-start;font-size:.82rem;color:var(--muted);min-width:0}
+.howto b{display:block;color:var(--ink);font-size:.88rem}
+.howto div::before{counter-increment:st;content:counter(st);flex:none;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:800;font-size:.75rem;display:grid;place-items:center}
+@media (max-width:520px){.howto{grid-template-columns:minmax(0,1fr)}}
+.cta{display:flex;align-items:center;gap:14px;padding:14px;background:var(--bar);color:var(--bar-ink);border:0;border-radius:var(--r);cursor:pointer;text-align:left;width:100%;position:relative;overflow:hidden}
+.cta::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--yellow),var(--orange) 40%,var(--red))}
+.cta .cam{width:46px;height:46px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+.cta .cam svg{width:22px;height:22px}
+.cta span.t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cta small{color:color-mix(in oklab,var(--bar-ink) 70%,transparent);font-size:.82rem}
+.cta .go{font-weight:800;color:var(--accent)}
 .snapcard{display:flex;flex-direction:column;gap:12px;padding:14px}
 .snap-row{display:flex;gap:12px;align-items:center}
 .snap-row > div{min-width:0}
@@ -241,7 +265,15 @@ textarea{resize:vertical;min-height:70px}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
 .item .thumb{aspect-ratio:4/3;background:var(--surface-2);display:grid;place-items:center;position:relative;overflow:hidden}
-.item .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.item .thumb img{width:100%;height:100%;object-fit:contain;display:block}
+.zoomable{cursor:zoom-in}
+.zoom-hint{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;background:rgba(10,9,8,.6);color:#fff;display:grid;place-items:center;pointer-events:none}
+.zoom-hint svg{width:16px;height:16px}
+.lightbox{background:rgba(6,6,5,.92);flex-direction:column;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.lightbox img{max-width:100%;max-height:calc(100% - 70px);object-fit:contain;border-radius:10px;display:block}
+.lightbox figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:10px;max-height:100%;min-height:0;flex:1;justify-content:center;width:100%}
+.lightbox figcaption{color:#fff;font-weight:700;text-align:center;font-size:.95rem}
+.lightbox .lb-x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:12px;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff}
 .item .thumb .glyph{width:60px;height:60px;color:color-mix(in oklab,var(--orange) 55%,var(--muted))}
 .glyph{color:color-mix(in oklab,var(--orange) 55%,var(--muted))}
 .item .thumb .badges{position:absolute;top:8px;left:8px;right:8px;display:flex;justify-content:space-between;gap:6px}
@@ -337,7 +369,9 @@ input[type=file]{font-size:.85rem;color:var(--muted)}
 .qr img,.qr canvas{display:block;width:200px;height:200px}
 .code{font-family:var(--f-mono);font-size:1.5rem;font-weight:700;letter-spacing:.2em;text-align:center}
 .cam{width:100%;max-width:280px;aspect-ratio:1;object-fit:cover;border-radius:16px;align-self:center;background:#0b0a09}
-.notif{display:flex;flex-direction:column;gap:2px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.notif{display:flex;flex-direction:column;gap:2px;padding:11px 8px;margin:0 -8px;border:0;border-bottom:1px solid var(--line);font-size:.9rem;background:none;text-align:left;width:calc(100% + 16px);cursor:pointer;color:var(--ink);border-radius:8px}
+.notif:hover{background:var(--surface-2)}
+.notif .go{color:var(--accent-text);font-weight:700}
 .notif.unread b::before{content:"";display:inline-block;width:7px;height:7px;background:var(--orange);border-radius:50%;margin-right:7px;vertical-align:2px}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:calc(100% - 32px);font-size:.92rem}
 @media (min-width:821px){.toast{bottom:28px}}
@@ -359,7 +393,7 @@ input[type=file]{font-size:.85rem;color:var(--muted)}
     <span class="role-tag" id="roleTag" hidden>SDP Admin</span>
     <button class="pts-chip" id="ptsChip" data-act="go" data-v="rewards"></button>
     <button class="iconbtn" id="bell" data-act="notifs" aria-label="Notifications"></button>
-    <button class="avatar" id="meBtn" data-act="account" aria-label="Account and sign out"></button>
+    <button class="avatar" id="meBtn" data-act="account" aria-label="Account and settings"></button>
   </div>
 </header>
 
@@ -430,7 +464,7 @@ function slotImg(base, alt, fallback){
   const src = imgFound[base] || base+'.'+IMG_EXTS[0];
   return `<img src="${src}" alt="${esc(alt)}" data-base="${base}" onload="wlImgOk(this)" onerror="wlImgErr(this)"><span class="fb" hidden>${fallback}</span>`;
 }
-window.wlImgOk = el => { imgFound[el.dataset.base] = el.getAttribute('src'); };
+window.wlImgOk = el => { imgFound[el.dataset.base] = el.getAttribute('src'); const h = el.parentElement?.querySelector('.zoom-hint'); if(h) h.hidden = false; };
 window.wlImgErr = el => {
   const base = el.dataset.base, ext = el.getAttribute('src').split('.').pop();
   const next = IMG_EXTS[IMG_EXTS.indexOf(ext)+1];
@@ -447,6 +481,7 @@ async function fileToDataUrl(file, max=640, q=0.78){
   } finally { URL.revokeObjectURL(url); }
 }
 const glyph = c => `<svg class="glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="${(CAT[c]||CAT.other).p}"/></svg>`;
+const ZOOM_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M11 8.5v5M8.5 11h5"/></svg>';
 const itemThumb = (l, alt='') => l.photo ? `<img src="${l.photo}" alt="${esc(alt)}">` : slotImg(l.img || DEMO_IMG[l.title], alt, glyph(l.category));
 const ZONES = ['Elmina Green 1','Elmina Green 2','Elmina West','Elmina East','Elmina Lakeside'];
 const PTS = {reuse:50, receive:10, recycle:20};
@@ -593,6 +628,28 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 const user = id => S.users.find(u=>u.id===id) || {name:'Neighbour',zone:'—'};
 const co2For = (cat,route,w) => Math.round(((CAT[cat]||CAT.other)[route==='recycle'?'recycle':'reuse']||0)*w*10)/10;
 function notify(userId,text){ S.notifs.unshift({id:uid('n'),userId,text,at:now(),read:false}); }
+// Where a notification should take you, worked out from what it says.
+function notifTarget(n){
+  const t = n.text;
+  if(n.userId==='admin'){
+    if(/showcase/i.test(t)) return {view:'show', label:'Showcase'};
+    if(/recycl|collection|routed|queue/i.test(t)) return {view:'collect', label:'Collection'};
+    return {view:'esg', label:'ESG'};
+  }
+  if(/showcase/i.test(t)) return {view:'impact', label:'Impact'};
+  if(/wishlist|matches your/i.test(t)) return {view:'market', tab:'feed', label:'Market'};
+  if(/redeem|voucher/i.test(t)) return {view:'rewards', label:'Rewards'};
+  if(/claimed your|scanned your|routed|removed your|will collect|collected|your listing|“.*” will be/i.test(t)) return {view:'market', tab:'mine', label:'My listings'};
+  if(/claimed|handover/i.test(t)) return {view:'market', tab:'mine', label:'My listings'};
+  if(/points/i.test(t)) return {view:'rewards', label:'Rewards'};
+  return {view:'home', label:'Home'};
+}
+function notifGo(id){
+  const n = S.notifs.find(x=>x.id===id); if(!n) return;
+  const g = notifTarget(n); closeSheet();
+  if(isAdmin()) S.adminView = g.view; else { S.view = g.view; if(g.tab) S.marketTab = g.tab; }
+  save(); render(); window.scrollTo(0,0);
+}
 function award(userId,pts,reason){ S.points[userId]=(S.points[userId]||0)+pts; S.ledger.unshift({userId,pts,reason,at:now()}); }
 function processClock(){
   const t = now(); let routed = 0;
@@ -668,7 +725,7 @@ async function analyze(){
   const sn = U.snap;
   if(!U.sample) await checkAI();
   if(!U.sample){ sn.stage='error'; sn.err='The AI server is not connected yet (see the README to add your API key). You can choose a route yourself for now.'; render(); return; }
-  sn.stage='analyzing'; sn.err=''; sn.chat=[]; startProgress(); render();
+  sn.stage='analyzing'; sn.err=''; sn.chat=[]; S.view='market'; S.marketTab='list'; startProgress(); render();
   U.ctl = new AbortController();
   try{
     const opts = {signal:U.ctl.signal};
@@ -794,12 +851,20 @@ async function doLogin(){
     render();
   }
 }
+function getTheme(){ try{ return localStorage.getItem('wl-theme') || 'light'; }catch(e){ return 'light'; } }
+function setTheme(t){
+  try{ localStorage.setItem('wl-theme', t); }catch(e){}
+  if(t==='system') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', t);
+}
 function showAccount(){
   if(!SESSION) return;
   const adm = isAdmin(), me = user('me');
   sheet(`<div class="sheet-head"><div class="row" style="flex-wrap:nowrap"><span class="avatar lg">${esc(initials(SESSION.name))}</span>
       <div><h2>${esc(SESSION.name)}</h2><p class="small muted">${adm?'SDP staff · '+esc(SESSION.id):'Unit '+esc(SESSION.id)+' · '+esc(me.zone)}</p></div></div>
       <button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
+    <div class="stack" style="gap:8px"><span class="eyebrow">Settings</span>
+      <div class="row" style="justify-content:space-between"><b>Theme</b>
+        <div class="seg" role="group" aria-label="Theme">${[['light','Light'],['dark','Dark'],['system','System']].map(([k,l])=>`<button data-act="theme" data-v="${k}" aria-pressed="${getTheme()===k}">${l}</button>`).join('')}</div></div></div>
     <div class="proto stack"><span class="eyebrow">Prototype controls</span>
       <p class="small muted">Demo clock: <b class="mono">day +${S.dayOffset}</b>. Skip ahead to watch unclaimed listings expire into recycling.</p>
       <div class="row"><button class="btn sm" data-act="skip">Skip ahead 1 day</button><button class="btn sm ghost" data-act="reset">Reset demo data</button></div></div>
@@ -817,6 +882,8 @@ function confirmSheet({title, body='', ok='Confirm', tone='primary'}, fn){
 }
 
 function afterRender(){
+  // magnifier on cards whose photo is already loaded (own snaps, admin uploads, cached files)
+  document.querySelectorAll('.thumb .zoom-hint').forEach(h=>{ const im=h.parentElement.querySelector('img:not([hidden])'); if(im && (im.src.startsWith('data:') || im.complete && im.naturalWidth)) h.hidden=false; });
   document.querySelectorAll('[data-qr]').forEach(el=>{
     if(el.dataset.done) return; el.dataset.done='1';
     if(window.QRCode){ try{ new QRCode(el,{text:el.dataset.qr,width:200,height:200,colorDark:'#0B1A12',colorLight:'#FFFFFF',correctLevel:QRCode.CorrectLevel.M}); }catch(e){} }
@@ -830,9 +897,6 @@ function afterRender(){
 
 /* ---------- resident: snap ---------- */
 function vHome(){
-  const sn = U.snap;
-  if(sn.stage==='analyzing') return vAnalyzing();
-  if(sn.stage==='result') return vResult();
   const me = user('me');
   const standalone = window.navigator.standalone===true || matchMedia('(display-mode: standalone)').matches;
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -840,22 +904,11 @@ function vHome(){
   const install = (!standalone && isIOS && !hideInstall) ? `<div class="install">${I.spark}<div style="flex:1">Install WasteLoop: tap <b>Share</b> in Safari, then <b>Add to Home Screen</b>.</div><button class="btn sm ghost" data-act="dismiss-install">OK</button></div>` : '';
   const near = S.listings.filter(l=>l.ownerId!=='me' && l.status==='open').sort((a,b)=>a.expiresAt-b.expiresAt).slice(0,3);
   const h = new Date().getHours(), greet = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
-  const ready = sn.photo || sn.desc.trim();
   return `
   <div class="hello"><span class="eyebrow">${esc(me.zone)}${me.unit?' · Unit '+esc(me.unit):''}</span><h1>${greet}, ${esc(me.name)}</h1></div>
   ${install}
-  <section class="card snapcard" aria-label="AI Smart Snap">
-    <div class="snap-row">
-      <label class="snap-btn" id="drop" title="Snap or upload a photo">${sn.photo?`<img src="${sn.photo}" alt="Selected photo">`:I.camera}
-        <input type="file" id="photo" accept="image/*" capture="environment" aria-label="Snap or upload a photo of the item"></label>
-      <div><h3>${sn.photo?'Photo ready':'Sort an item with AI'}</h3>
-        <p class="small muted">${sn.photo?'Add a few words if you like, then tap Sort.':'Snap it, or describe it below. AI picks reuse, recycle or dispose.'}</p></div>
-    </div>
-    <form class="snap-form" data-form="snap"><input type="text" id="desc" value="${esc(sn.desc)}" placeholder="Or describe it, e.g. sofa with one stain" aria-label="Describe the item"><button class="btn primary" id="goBtn" ${ready?'':'disabled'}>${I.spark}<span>Sort</span></button></form>
-    ${sn.stage==='error'?`<div class="banner">${I.info}<div>${esc(sn.err)}${ready?` <button type="button" class="linkbtn" data-act="manual">Choose route myself</button>`:''}</div></div>`:''}
-    ${U.sample===null&&sn.stage!=='error'?`<p class="small muted">AI sorting is offline right now. You can still choose a route yourself.</p>`:''}
-    <div class="legend3"><span><i class="d reuse"></i>Reuse +${PTS.reuse}</span><span><i class="d recycle"></i>Recycle +${PTS.recycle}</span><span><i class="d dispose"></i>Dispose 0</span></div>
-  </section>
+  <button class="cta" data-act="go-list"><span class="cam">${I.camera}</span>
+    <span class="t"><b>List your item</b><small>Snap it and AI writes the listing for you</small></span><span class="go">Start →</span></button>
   <section class="stack">
     <div class="sec-head"><h2>Free near you</h2><button class="linkbtn" data-act="go" data-v="market">See all</button></div>
     ${near.length?`<div class="card rowlist" style="padding:2px 14px">${near.map(irow).join('')}</div>`:`<div class="empty">Nothing listed right now. Check back later.</div>`}
@@ -951,10 +1004,10 @@ function vResult(){
       <button class="btn" data-act="done-dispose">Done</button></div>`;
   return `
   <div class="page-head"><div><span class="eyebrow">AI Smart Snap · result</span><h1>${esc(r.item)}</h1></div>
-    <button class="btn" data-act="new-snap">Back to home</button></div>
+    <button class="btn" data-act="new-snap">Start over</button></div>
   ${!r.isItem?`<div class="banner">${I.info}<div>The AI isn't sure this photo shows a household item. Check the details below or try another photo.</div></div>`:''}
   <div class="card verdict">
-    ${sn.photo?`<img class="photo" src="${sn.photo}" alt="${esc(r.item)}">`:`<div class="photo" style="display:grid;place-items:center;color:var(--muted)">${glyph(r.category)}</div>`}
+    ${sn.photo?`<img class="photo zoomable" data-act="zoom" data-cap="${esc(r.item)}" src="${sn.photo}" alt="${esc(r.item)}">`:`<div class="photo" style="display:grid;place-items:center;color:var(--muted)">${glyph(r.category)}</div>`}
     <div class="stack" style="gap:14px;min-width:0">
       <div class="row" style="justify-content:space-between">
         <span class="stamp ${route}"><span class="ico">${I[route]}</span>${routeName(route)}</span>
@@ -1000,7 +1053,7 @@ function itemCard(l){
   else if(l.status==='reserved') act = mine ? `<button class="btn sm primary" data-act="show-qr" data-v="${l.id}">${I.qr} Show QR</button>` : (l.claimerId==='me'?`<button class="btn sm primary" data-act="scan" data-v="${l.id}">${I.qr} Scan at pickup</button>`:`<span class="pill neutral">Reserved</span>`);
   const status = {open:'',reserved:'<span class="pill warn">Reserved</span>',reused:'<span class="pill reuse">Reused</span>',routed:'<span class="pill recycle">To recycling</span>',scheduled:'<span class="pill recycle">Pickup scheduled</span>',recycled:'<span class="pill recycle">Recycled</span>',disposed:'<span class="pill dispose">Disposed</span>',removed:'<span class="pill neutral">Removed</span>'}[l.status]||'';
   return `<article class="item">
-    <div class="thumb">${itemThumb(l, l.title)}
+    <div class="thumb zoomable" data-act="zoom" data-cap="${esc(l.title)}">${itemThumb(l, l.title)}<span class="zoom-hint" hidden>${ZOOM_ICON}</span>
       <div class="badges"><span class="pill ${l.mode==='swap'?'accent':'reuse'}">${l.mode==='swap'?'Swap':'Free'}</span>${status}</div></div>
     <div class="body"><h3>${esc(l.title)}</h3>
       <p class="small muted">${esc(l.description)}</p>
@@ -1012,13 +1065,14 @@ function vMarket(){
   const tab = S.marketTab;
   const cats = ['all',...new Set(S.listings.filter(l=>l.route==='reuse').map(l=>l.category))];
   let body = '';
-  if(tab==='feed'){
+  if(tab==='list'){ body = vList(); }
+  else if(tab==='feed'){
     const feed = S.listings.filter(l=>l.ownerId!=='me' && (l.status==='open'||(l.status==='reserved'&&l.claimerId==='me')) && (S.cat==='all'||l.category===S.cat)).sort((a,b)=>a.expiresAt-b.expiresAt);
     body = `<div class="chips">${cats.map(c=>`<button class="chip" data-act="cat" data-v="${c}" aria-pressed="${S.cat===c}">${c==='all'?'All':esc(CAT[c].label)}</button>`).join('')}</div>
       ${feed.length?`<div class="cards">${feed.map(itemCard).join('')}</div>`:`<div class="empty">Nothing in this category right now. Add it to your wishlist and the AI will tell you when a neighbour posts one.</div>`}`;
   } else if(tab==='mine'){
     const mine = S.listings.filter(l=>l.ownerId==='me').sort((a,b)=>b.createdAt-a.createdAt);
-    body = mine.length?`<div class="cards">${mine.map(itemCard).join('')}</div>`:`<div class="empty">You haven't posted anything yet. <button class="btn sm" data-act="go" data-v="home">Snap an item</button></div>`;
+    body = mine.length?`<div class="cards">${mine.map(itemCard).join('')}</div>`:`<div class="empty">You haven't posted anything yet. <button class="btn sm primary" data-act="mtab" data-v="list">List your item</button></div>`;
   } else {
     const ws = S.wishlist.filter(w=>w.userId==='me');
     body = `<div class="card stack"><h3>Looking for something?</h3><p class="small muted">Post it here before buying new. When a neighbour lists a match, you get a notification. This is the Reduce part of the 3Rs.</p>
@@ -1029,8 +1083,31 @@ function vMarket(){
   const res = S.listings.filter(l=>l.claimerId==='me'&&l.status==='reserved').length;
   return `<div class="page-head"><div><span class="eyebrow">Circular marketplace</span><h1>From your neighbours</h1>
     <p class="muted" style="margin-top:6px">Everything is free or a swap. Claim it, meet at pickup, scan the owner's QR to confirm.</p></div></div>
-    <div class="subtabs">${[['feed','Neighbours'+(res?` · ${res} reserved`:'')],['mine','My listings'],['wish','Wishlist']].map(([k,l])=>`<button data-act="mtab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
+    <div class="subtabs">${[['feed','Neighbours'+(res?` · ${res} reserved`:'')],['list','+ List your item'],['mine','My listings'],['wish','Wishlist']].map(([k,l])=>`<button data-act="mtab" data-v="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')}</div>
     ${body}`;
+}
+
+function vList(){
+  const sn = U.snap;
+  if(sn.stage==='analyzing') return vAnalyzing();
+  if(sn.stage==='result') return vResult();
+  const ready = sn.photo || sn.desc.trim();
+  return `<section class="card stack" style="gap:16px" aria-label="List your item">
+    <div><span class="eyebrow">AI Smart Snap</span><h2>List your item</h2></div>
+    <div class="howto"><div><span><b>Snap it</b>Take or choose a photo</span></div><div><span><b>AI checks it</b>Item, condition and best route</span></div><div><span><b>You confirm</b>Post it, or send it to recycling</span></div></div>
+    <div class="listgrid">
+      <label class="picker" id="drop">${sn.photo?`<img src="${sn.photo}" alt="Your photo"><span class="change">Change photo</span>`:`<span class="cam">${I.camera}</span><b>Take or choose a photo</b><span class="small muted">A clear photo of the whole item works best</span>`}
+        <input type="file" id="photo" accept="image/*" capture="environment" aria-label="Take or choose a photo of the item"></label>
+      <form class="stack" data-form="snap" style="gap:12px">
+        <label class="f">Describe it <span style="font-weight:400">(optional, or instead of a photo)</span>
+          <input type="text" id="desc" value="${esc(sn.desc)}" placeholder="e.g. 3-seater sofa, one cushion stained"></label>
+        <button class="btn primary big" id="goBtn" ${ready?'':'disabled'}>${I.spark}<span>Check with AI</span></button>
+        ${sn.stage==='error'?`<div class="banner">${I.info}<div>${esc(sn.err)}${ready?` <button type="button" class="linkbtn" data-act="manual">Choose route myself</button>`:''}</div></div>`:''}
+        ${U.sample===null&&sn.stage!=='error'?`<p class="small muted">AI is offline right now. You can still choose a route yourself after adding a photo or description.</p>`:''}
+        <p class="small muted">You review everything before it goes live. Nothing is posted until you tap Post.</p>
+        <div class="legend3"><span><i class="d reuse"></i>Reuse +${PTS.reuse} pts</span><span><i class="d recycle"></i>Recycle +${PTS.recycle} pts</span><span><i class="d dispose"></i>Dispose 0</span></div>
+      </form>
+    </div></section>`;
 }
 
 /* ---------- resident: impact ---------- */
@@ -1071,8 +1148,8 @@ function projImg(p, side, fallback=''){
 }
 function projCard(p, admin=false){
   return `<article class="proj"><div class="ba">
-      <div class="b">${projImg(p,'before')}<span class="tag">Before</span></div>
-      <div class="a">${projImg(p,'after',shapeSvg(p.shape))}<span class="tag">After</span></div></div>
+      <div class="b zoomable" data-act="zoom" data-cap="${esc(p.title)} · before">${projImg(p,'before')}<span class="tag">Before</span></div>
+      <div class="a zoomable" data-act="zoom" data-cap="${esc(p.title)} · after">${projImg(p,'after',shapeSvg(p.shape))}<span class="tag">After</span></div></div>
     <div class="body"><h3>${esc(p.title)}</h3><p class="small muted">${esc(p.note)}</p>
     <div class="row small"><span class="pill accent">${kg(p.kg)} reused</span><span class="muted">${esc(p.material)}</span></div>
     <p class="small muted">${esc(p.location)} · ${esc(p.date)}</p>
@@ -1256,13 +1333,20 @@ function vShowAdmin(){
 
 /* ---------- overlays ---------- */
 function sheet(html, cls=''){ document.getElementById('overlay').innerHTML = `<div class="scrim ${cls}" data-act="close-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`; afterRender(); }
+function openZoom(el){
+  const im = el.tagName==='IMG' ? el : el.querySelector('img:not([hidden])');
+  if(!im || !(im.naturalWidth || im.src.startsWith('data:'))) return;   // nothing to inspect (drawn symbol)
+  document.getElementById('overlay').innerHTML = `<div class="scrim lightbox" data-act="close-bg" role="dialog" aria-modal="true" aria-label="Photo">
+    <button class="iconbtn lb-x" data-act="close" aria-label="Close photo">${I.x}</button>
+    <figure data-act="close-bg"><img src="${im.getAttribute('src')}" alt="${esc(el.dataset.cap||'')}"><figcaption>${esc(el.dataset.cap||'')}</figcaption></figure></div>`;
+}
 function closeSheet(){ stopScanner(); document.getElementById('overlay').innerHTML=''; }
 function toast(t){ const h=document.getElementById('toastHost'); h.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`; clearTimeout(toast._t); toast._t=setTimeout(()=>h.innerHTML='',2800); }
 function showNotifs(){
   const who = isAdmin()?'admin':'me';
   const list = S.notifs.filter(n=>n.userId===who).slice(0,20);
   sheet(`<div class="sheet-head"><h2>Notifications</h2><button class="iconbtn" data-act="close" aria-label="Close">${I.x}</button></div>
-    ${list.length?`<div>${list.map(n=>`<div class="notif ${n.read?'':'unread'}"><b style="font-weight:500">${esc(n.text)}</b><span class="small muted">${new Date(n.at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}</span></div>`).join('')}</div>`:'<p class="muted">Nothing yet.</p>'}`);
+    ${list.length?`<div>${list.map(n=>`<button class="notif ${n.read?'':'unread'}" data-act="notif-go" data-v="${n.id}"><b style="font-weight:500">${esc(n.text)}</b><span class="small muted">${new Date(n.at).toLocaleString('en-MY',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})} · <span class="go">Open ${esc(notifTarget(n).label)} →</span></span></button>`).join('')}</div>`:'<p class="muted">Nothing yet.</p>'}`);
   list.forEach(n=>n.read=true); save(); render();
 }
 function showQR(id){
@@ -1348,6 +1432,10 @@ function doAct(a, v, t){
     case 'cancel-ai': U.ctl?.abort(); break;
     case 'manual': { const sn=U.snap; sn.result={isItem:true,item:(sn.desc||'My item').slice(0,40),category:'other',description:sn.desc,condition:'fair',route:'reuse',confidence:0,reason:'Route chosen by you (AI unavailable).',material:'—',weightKg:3,valueRm:0,tip:''}; sn.route='reuse'; sn.title=sn.result.item; sn.descEdit=sn.desc; sn.stage='result'; render(); break; }
     case 'new-snap': resetSnap(); render(); window.scrollTo(0,0); break;
+    case 'go-list': S.view='market'; S.marketTab='list'; save(); render(); window.scrollTo(0,0); break;
+    case 'zoom': openZoom(t); break;
+    case 'notif-go': notifGo(v); break;
+    case 'theme': setTheme(v); showAccount(); break;
     case 'route': U.snap.route=v; keepEdits(); render(); break;
     case 'mode': keepEdits(); U.snap.mode=v; render(); break;
     case 'ask': askWhy(v); break;
