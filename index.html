@@ -379,9 +379,61 @@ input[type=file]{font-size:.85rem;color:var(--muted)}
 .banner svg{width:19px;height:19px;flex:none;color:var(--orange);margin-top:1px}
 .flowrow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
 .flowrow span.s{background:var(--surface-2);padding:3px 9px;border-radius:999px;font-weight:600}
+
+/* launch screen: plays once each time the app is opened; tap to skip */
+#splash{position:fixed;inset:0;z-index:200;background:#121110;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;animation:sp-out .45s ease 2.35s forwards}
+#splash.done{animation:sp-out .3s ease forwards}
+@keyframes sp-out{to{opacity:0;visibility:hidden}}
+.sp-in{display:flex;flex-direction:column;align-items:center;gap:12px;padding:0 16px;text-align:center}
+.sp-mark{width:120px;height:120px;overflow:visible}
+.sp-arc,.sp-head{fill:none;stroke:#FF6A13;stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.sp-arc{stroke-dasharray:1;stroke-dashoffset:1;opacity:0;animation:sp-draw .6s cubic-bezier(.6,0,.2,1) .15s forwards}
+.sp-arc.b{animation-delay:.32s}
+.sp-head{opacity:0;transform-box:fill-box;transform-origin:center;animation:sp-pop .28s ease .72s forwards}
+.sp-head.b{animation-delay:.82s}
+.sp-rot{transform-box:view-box;transform-origin:24px 24px;animation:sp-spin .95s cubic-bezier(.65,0,.35,1) 1s}
+.sp-dot{fill:#FFC21A;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:sp-dot .45s cubic-bezier(.3,1.7,.5,1) .55s forwards}
+.sp-word{font-family:var(--f-display);font-weight:800;font-size:clamp(2.2rem,9vw,3rem);letter-spacing:-.03em;line-height:1;opacity:0;transform:translateY(12px);animation:sp-up .5s ease 1.05s forwards}
+.sp-word .o{color:#FF6A13}
+.sp-tag{color:rgba(255,255,255,.72);font-size:.98rem;opacity:0;transform:translateY(8px);animation:sp-up .5s ease 1.4s forwards}
+.sp-bar{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);height:5px;background:rgba(255,255,255,.08)}
+.sp-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFC21A,#FF6A13 45%,#D7261E);animation:sp-fill 2.1s cubic-bezier(.4,0,.2,1) .2s forwards}
+.sp-skip{position:absolute;bottom:calc(26px + env(safe-area-inset-bottom,0px));font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);opacity:0;animation:sp-up .4s ease .9s forwards}
+@keyframes sp-draw{from{opacity:1;stroke-dashoffset:1}to{opacity:1;stroke-dashoffset:0}}
+@keyframes sp-pop{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+@keyframes sp-spin{to{transform:rotate(360deg)}}
+@keyframes sp-dot{to{transform:scale(1)}}
+@keyframes sp-up{to{opacity:1;transform:none}}
+@keyframes sp-fill{to{width:100%}}
+@media (prefers-reduced-motion:reduce){
+  #splash *{animation:none!important;opacity:1!important;transform:none!important;stroke-dashoffset:0!important}
+  .sp-bar i{width:100%}
+  #splash{animation:sp-out .3s ease 1s forwards}
+}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true">
+  <div class="sp-in">
+    <svg class="sp-mark" viewBox="0 0 48 48"><g class="sp-rot">
+      <path class="sp-arc" pathLength="1" d="M8.96 18.53A16 16 0 0 1 39.04 18.53"/><path class="sp-arc b" pathLength="1" d="M39.04 29.47A16 16 0 0 1 8.96 29.47"/>
+      <path class="sp-head" d="M40.75 13.83L39.04 18.53L34.71 16.03"/><path class="sp-head b" d="M7.25 34.17L8.96 29.47L13.29 31.97"/></g>
+      <circle class="sp-dot" cx="24" cy="24" r="4.6"/></svg>
+    <div class="sp-word"><span>Waste</span><span class="o">Loop</span></div>
+    <p class="sp-tag">Snap it. Share it. Keep it out of landfill.</p>
+  </div>
+  <span class="sp-skip">Tap to skip</span>
+  <div class="sp-bar"><i></i></div>
+</div>
+<script>
+(function(){
+  var sp = document.getElementById('splash'); if(!sp) return;
+  try{ if(sessionStorage.getItem('wl-splash')){ sp.remove(); return; } sessionStorage.setItem('wl-splash','1'); }catch(e){}
+  function bye(){ if(!sp.isConnected) return; sp.classList.add('done'); setTimeout(function(){ sp.remove(); }, 320); }
+  sp.addEventListener('click', bye);
+  setTimeout(function(){ if(sp.isConnected) sp.remove(); }, 2900);
+})();
+</script>
 <div id="gate" hidden></div>
 <header class="top">
   <div class="top-in">
