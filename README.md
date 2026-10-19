@@ -6,7 +6,7 @@ WasteLoop is an AI-powered circular marketplace for Sime Darby Property township
 
 Built for the **Sime Darby Property University Hackathon 2026 (Planet theme)**, piloting in Elmina.
 
-**Live demo:** https://YOUR-LINK.vercel.app
+**Live demo:** https://wasteloop-seven.vercel.app
 On iPhone, open it in Safari and tap Share, then Add to Home Screen.
 
 | Demo account | ID | PIN / password |
