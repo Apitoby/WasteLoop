@@ -1,38 +1,26 @@
-// Shared AI helper. Keys stay on the server; phones never see them.
-// Uses Google Gemini (free tier) when GEMINI_API_KEY is set, otherwise Anthropic Claude.
+// Shared AI helper (Google Gemini). The API key stays on the server; phones never see it.
 //
-// Messages use one simple shape for both providers:
+// Messages use one simple shape:
 //   [{ role: 'user' | 'assistant', text: string, image?: base64 JPEG }]
 
 export function provider() {
-  if (process.env.GEMINI_API_KEY) return 'gemini';
-  if (process.env.ANTHROPIC_API_KEY) return 'anthropic';
-  return null;
+  return process.env.GEMINI_API_KEY ? 'gemini' : null;
 }
 
-export async function callAI({ kind, messages, maxTokens = 800, json = false }) {
-  const p = provider();
-  if (!p) { const e = new Error('No AI key set. Add GEMINI_API_KEY (free) or ANTHROPIC_API_KEY on the server.'); e.code = 'not_configured'; throw e; }
-  return p === 'gemini' ? gemini({ kind, messages, maxTokens, json }) : anthropic({ kind, messages, maxTokens });
-}
-
-/* ---------- Google Gemini ---------- */
 // Models to try in order. GEMINI_MODEL can be one name or a comma-separated list.
 export function geminiModels() {
   const list = (process.env.GEMINI_MODEL || 'gemini-flash-latest,gemini-flash-lite-latest')
     .split(',').map(s => s.trim()).filter(Boolean);
   return [...new Set(list)];
 }
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-// Busy / overloaded / temporary errors: worth retrying or switching model.
-const isBusy = e => [429, 500, 503, 504].includes(e.status) || /overload|high demand|unavailable|try again/i.test(e.message || '');
 
-async function gemini(args) {
+export async function callAI({ messages, maxTokens = 800, json = false }) {
+  if (!provider()) { const e = new Error('No AI key set. Add GEMINI_API_KEY on the server.'); e.code = 'not_configured'; throw e; }
   const models = geminiModels();
   let last;
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt++) {
-      try { return await geminiOnce(model, args); }
+      try { return await geminiOnce(model, { messages, maxTokens, json }); }
       catch (e) {
         last = e;
         if (!isBusy(e)) throw e;                 // a real error (bad key, bad request): stop now
@@ -43,6 +31,10 @@ async function gemini(args) {
   last.message = `All Gemini models are busy right now (${models.join(', ')}). ${last.message}`;
   throw last;
 }
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Busy / overloaded / temporary errors: worth retrying or switching model.
+const isBusy = e => [429, 500, 503, 504].includes(e.status) || /overload|high demand|unavailable|try again/i.test(e.message || '');
 
 async function geminiOnce(model, { messages, maxTokens, json }) {
   const contents = messages.map(m => ({
@@ -68,28 +60,6 @@ async function geminiOnce(model, { messages, maxTokens, json }) {
     e.code = j.promptFeedback?.blockReason ? 'refused' : 'upstream_error'; throw e;
   }
   return text;
-}
-
-/* ---------- Anthropic Claude ---------- */
-async function anthropic({ kind, messages, maxTokens }) {
-  const model = kind === 'vision'
-    ? (process.env.WASTELOOP_MODEL || 'claude-sonnet-5-5')
-    : (process.env.WASTELOOP_CHAT_MODEL || 'claude-haiku-5-5');
-  const msgs = messages.map(m => ({
-    role: m.role,
-    content: [
-      ...(m.image ? [{ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: m.image } }] : []),
-      { type: 'text', text: m.text },
-    ],
-  }));
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY.trim(), 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model, max_tokens: maxTokens, messages: msgs }),
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw apiError(r.status, j?.error?.message || `Anthropic API error ${r.status}`);
-  return (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
 }
 
 function apiError(status, message) {

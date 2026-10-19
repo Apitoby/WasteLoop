@@ -31,7 +31,7 @@ export const findAccount = (role, id) => accounts(role).find(a => a.id.toUpperCa
 
 function key() {
   return process.env.SESSION_SECRET ||
-    crypto.createHash('sha256').update('wasteloop|' + (process.env.GEMINI_API_KEY || process.env.ANTHROPIC_API_KEY || 'demo')).digest('hex');
+    crypto.createHash('sha256').update('wasteloop|' + (process.env.GEMINI_API_KEY || 'demo')).digest('hex');
 }
 
 export function safeEqual(a, b) {

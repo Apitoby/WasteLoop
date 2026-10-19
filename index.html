@@ -893,15 +893,12 @@ async function analyze(){
 }
 function errCopy(code){
   return ({unauthorized:'Your sign-in expired. Sign in again.',
-    not_configured:'The AI server has no API key yet. Add a free GEMINI_API_KEY in your Vercel settings (see README).',
-    not_granted:'AI sorting needs your permission to use Claude. Reload the page and allow it to try again.',
-    sampling_disabled:'Claude is not available for this account, so AI sorting is off. Choose a route yourself below.',
+    not_configured:'The AI server has no API key yet. Add GEMINI_API_KEY in the Vercel settings (see docs/DEPLOYMENT.md).',
     rate_limited:'Too many requests just now. Wait a minute and try again.',
     image_rejected:'That photo could not be read. Try a JPEG or PNG under 20 MB.',
     images_unavailable:'Photos cannot be sent to AI in this view. Describe the item in words instead.',
     refused:'The AI could not assess this one. Try a different photo or description.',
-    invalid_json:'The AI reply came back garbled. Try again.',
-    session_expired:'Your session expired. Sign in to Claude again, then retry.'})[code] || 'Something went wrong reaching the AI. Try again.';
+    invalid_json:'The AI reply came back garbled. Try again.'})[code] || 'Something went wrong reaching the AI. Try again.';
 }
 async function askWhy(q){
   const sn = U.snap; if(!U.sample || sn.chatBusy || !q.trim()) return;

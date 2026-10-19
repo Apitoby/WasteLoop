@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     if (image && (typeof image !== 'string' || image.length > 4_000_000)) {
       const e = new Error('Image too large; send a JPEG under about 3 MB'); e.code = 'bad_request'; throw e;
     }
-    const text = await callAI({ kind: 'vision', json: true, maxTokens: 700,
+    const text = await callAI({ json: true, maxTokens: 700,
       messages: [{ role: 'user', text: prompt, image: image || undefined }] });
     const result = parseJson(text);
     if (!result) return res.status(502).json({ code: 'invalid_json', error: 'AI reply was not valid JSON' });

@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       if (last && last.role === m.role) last.text += '\n\n' + m.text; else merged.push({ ...m });
     }
     if (!merged.length || merged[merged.length - 1].role !== 'user') { const e = new Error('Last message must be from the user'); e.code = 'bad_request'; throw e; }
-    const text = await callAI({ kind: 'chat', messages: merged, maxTokens: 400 });
+    const text = await callAI({ messages: merged, maxTokens: 400 });
     res.status(200).json({ text: text || 'Sorry, I could not answer that.' });
   } catch (e) { sendError(res, e); }
 }
